@@ -1,0 +1,13 @@
+{
+  "name": "fd-script",
+  "version": "1.0.0",
+  "description": "a tool to extract chinese in `.ts` or `.tsx` file",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^10.12.14",
+    "shortid": "^2.2.15",
+    "ts-node": "^7.0.1",
+    "typescript": "^3.2.2"
+  }
+}
