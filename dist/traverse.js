@@ -9,7 +9,6 @@ function measureText(text, template) {
     if (template)
         return '';
     var res = text.replace(/;/g, '').replace(/[\r\n]/g, '').replace(/\$/g, '').replace(/[`'"]/g, '');
-    console.log(res);
     return res;
 }
 /**
@@ -28,7 +27,10 @@ function writeFile(textArr, targetFilePath, template) {
 }
 function init(config) {
     return new Promise(function (resolve, reject) {
-        var outputPath = config.outputPath;
+        var outputPath = config.outputPath, whiteList = config.whiteList;
+        if (whiteList) {
+            WHITE_LIST_FILE_TYPE = whiteList;
+        }
         try {
             // 初始化时新建或清空文件
             fs.writeFileSync(outputPath, 'export default {');
@@ -46,13 +48,13 @@ function init(config) {
  * @param {string} pathName 遍历根路径
  * @param {string} outFilePath 输出路径
  */
-function traverseDir(pathName, outFilePath, template) {
+function traverseDir(pathName, outFilePath, template, extractOnly) {
     // 只对ts和tsx文件进行中文抽取
     if (fs.statSync(pathName).isFile()) {
         if (!WHITE_LIST_FILE_TYPE.includes(path.extname(pathName)))
             return;
         var text = fs.readFileSync(pathName).toString(); // buffer to string
-        var result = findChinese_1.findTextInTs(text, pathName);
+        var result = findChinese_1.findTextInTs(text, pathName, extractOnly);
         writeFile(result, outFilePath, template);
     }
     else {
@@ -60,14 +62,14 @@ function traverseDir(pathName, outFilePath, template) {
         var files = fs.readdirSync(pathName);
         files.forEach(function (file) {
             var absPath = path.resolve(pathName, file);
-            traverseDir(absPath, outFilePath, template);
+            traverseDir(absPath, outFilePath, template, extractOnly);
         });
     }
 }
 function traverse(config) {
     init(config)
         .then(function (conf) {
-        traverseDir(conf.rootPath, conf.outputPath, conf.template);
+        traverseDir(conf.rootPath, conf.outputPath, conf.template, conf.extractOnly);
         fs.appendFileSync(conf.outputPath, '}');
         console.timeEnd('总计用时：');
     })["catch"](function (err) {

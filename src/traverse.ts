@@ -2,13 +2,12 @@ import { findTextInTs, Text } from "./findChinese";
 import * as fs from "fs";
 import * as path from "path";
 
-const WHITE_LIST_FILE_TYPE = ['.ts', '.tsx', '.js', '.jsx']
+let WHITE_LIST_FILE_TYPE = ['.ts', '.tsx', '.js', '.jsx']
 const TAB = ' '
 
 function measureText(text: string, template: boolean) {
   if(template) return ''
   const res = text.replace(/;/g, '').replace(/[\r\n]/g, '').replace(/\$/g, '').replace(/[`'"]/g, '')
-  console.log(res)
   return res
 }
 
@@ -29,12 +28,17 @@ function writeFile(textArr: Text[], targetFilePath: string, template: boolean) {
 interface IConfig {
   outputPath: string
   rootPath: string
-  template: boolean
+  template: boolean,
+  extractOnly: boolean,
+  whiteList: string[]
 }
 
 function init(config: IConfig) {
   return new Promise((resolve, reject) => {
-    const { outputPath } = config
+    const { outputPath, whiteList } = config
+    if(whiteList) {
+      WHITE_LIST_FILE_TYPE = whiteList
+    }
     try {
       // 初始化时新建或清空文件
       fs.writeFileSync(outputPath, 'export default {')
@@ -52,19 +56,19 @@ function init(config: IConfig) {
  * @param {string} pathName 遍历根路径
  * @param {string} outFilePath 输出路径
  */
-function traverseDir(pathName: string, outFilePath: string, template: boolean) {
+function traverseDir(pathName: string, outFilePath: string, template: boolean, extractOnly: boolean) {
   // 只对ts和tsx文件进行中文抽取
   if (fs.statSync(pathName).isFile()) {
     if(!WHITE_LIST_FILE_TYPE.includes(path.extname(pathName))) return
     const text = fs.readFileSync(pathName).toString(); // buffer to string
-    const result = findTextInTs(text, pathName);
+    const result = findTextInTs(text, pathName, extractOnly);
     writeFile(result, outFilePath, template);
   } else {
     // 是一个文件夹需要遍历
     const files = fs.readdirSync(pathName);
     files.forEach(file => {
       const absPath = path.resolve(pathName, file);
-      traverseDir(absPath, outFilePath, template);
+      traverseDir(absPath, outFilePath, template, extractOnly);
     });
   }
 }
@@ -72,7 +76,7 @@ function traverseDir(pathName: string, outFilePath: string, template: boolean) {
 export function traverse(config: IConfig) {
   init(config)
     .then((conf: IConfig) => {
-      traverseDir(conf.rootPath, conf.outputPath, conf.template)
+      traverseDir(conf.rootPath, conf.outputPath, conf.template, conf.extractOnly)
       fs.appendFileSync(conf.outputPath, '}')
       console.timeEnd('总计用时：')
     })
