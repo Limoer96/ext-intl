@@ -1,7 +1,4 @@
 import i18n from '@/i18n';
-import i18n from '@/i18n';
-import i18n from '@/i18n';
-import i18n from '@/i18n';
 import React, { Component } from 'react'
 import styles from './style.module.scss'
 import { Modal, Form, Input } from 'antd'
@@ -29,7 +26,7 @@ export default class Index extends Component<IProps, IState> {
   saveRemark = () => {
     const { remark } = this.state
     if (remark.length > 500) {
-      message.error(I18N.D:WwwFd1FdTestXxx1, 2)
+      message.error(I18N.WwwFd1FdTestdirXxx1, 2)
       return false
     }
     this.props.saveRemark(this.state.remark)
@@ -40,8 +37,8 @@ export default class Index extends Component<IProps, IState> {
     return (
       <Modal
         visible={showModal}
-        title={I18N.D:WwwFd1FdTestXxx2}
-        okText={I18N.D:WwwFd1FdTestXxx3}
+        title={I18N.WwwFd1FdTestdirXxx2}
+        okText={I18N.WwwFd1FdTestdirXxx3}
         cancelText={I18N.D:WwwFd1FdTestXxx4}
         onOk={this.saveRemark}
         onCancel={this.props.cancel}

@@ -1,5 +1,5 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js version
+  C:\Program Files\nodejs\node.exe C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js publish
 
 PATH: 
   C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;D:\java\bin;D:\python;C:\Users\Administrator\AppData\Local\Android\Sdk\tools;C:\Users\Administrator\AppData\Local\Android\Sdk\platform-tools;C:\Program Files\TortoiseGit\bin;C:\Program Files\Microsoft VS Code\bin;C:\Program Files\nodejs\;D:\Git\cmd;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps;C:\Users\Administrator\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Administrator\AppData\Roaming\npm;D:\webstorm\WebStorm 2019.2.2\bin;;C:\Users\Administrator\AppData\Local\Yarn\bin;
@@ -29,14 +29,16 @@ Trace:
 npm manifest: 
   {
     "name": "ext-intl",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "一个可以提取中文词条和并注入词条名到源文件名的工具",
     "main": "dist/index.js",
     "scripts": {
       "compile": "tsc src/index.ts --outDir dist/",
       "intl": "node dist/index.js --path ./fd.config.js"
     },
-    "files": ["dist/*.js"],
+    "files": [
+      "dist/*.js"
+    ],
     "license": "MIT",
     "devDependencies": {
       "@types/node": "^10.12.14",
