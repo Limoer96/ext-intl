@@ -1,6 +1,6 @@
 {
   "name": "ext-intl",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "一个可以提取中文词条和并注入词条名到源文件名的工具",
   "main": "dist/index.js",
   "scripts": {
@@ -15,7 +15,12 @@
     "ts-node": "^7.0.1",
     "typescript": "^3.2.2"
   },
-  "keywords": ["react-intl", "intl", "AST", "typescript"],
+  "keywords": [
+    "react-intl",
+    "intl",
+    "AST",
+    "typescript"
+  ],
   "homepage": "https://github.com/xiaomoer/ext-intl",
   "bugs": "https://github.com/xiaomoer/ext-intl/issues",
   "repository": {
