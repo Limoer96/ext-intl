@@ -23,6 +23,7 @@
 
 ### 使用
 
+#### API
 ```js
 var extIntl = require('ext-intl')
 var path = require('path');
@@ -33,6 +34,25 @@ extIntl.traverse({
   extractOnly: true // 是否只扫描文件(不进行替换)
   whileList: ['.ts', '.tsx']
 })
+```
+
+#### CLI
+```
+Usage: extintl [options] [<absolute path>]
+  -p, --config
+    配置文件决定路径
+  <absolute path>
+    指定配置文件绝对路径
+
+配置文件示例：
+const path = require('path')
+module.exports = {
+  rootPath: path.resolve(__dirname, 'src'), // 遍历根目录
+  outputPath: path.resolve(__dirname, 'output.js'),
+  template: true, // 是否生成词条模板
+  extractOnly: false, // 是否只提取词条
+  whiteList: ['.ts', '.tsx', '.js', '.jsx'] // 白名单文件类型
+}
 ```
 ### API
 

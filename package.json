@@ -7,8 +7,12 @@
     "compile": "tsc src/index.ts --outDir dist/"
   },
   "files": [
-    "dist/*.js"
+    "dist/*.js",
+    "client.js"
   ],
+  "bin": {
+    "extintl": "client.js"
+  },
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^10.12.14",
