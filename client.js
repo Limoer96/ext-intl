@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const args = process.argv.slice(2)
-import { traverse } from './dist/index'
+const intl = require('./dist/index')
 
 function _findIndex(args) {
   let expected = ['--config', '-p'];
@@ -17,9 +17,8 @@ const index = _findIndex(args)
 
 if (index > -1) {
   let params = [...args]
-  params.splice(index, 1)
-  const configPath = params[0]
+  const configPath = params[1]
   const config = require(configPath)
-  traverse(config)
+  intl.traverse(config)
 }
 

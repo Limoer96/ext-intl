@@ -1,6 +1,6 @@
 const path = require('path')
 module.exports = {
-  rootPath: path.resolve(__dirname, 'src'), // 遍历根目录
+  rootPath: path.resolve(__dirname, 'testdir'), // 遍历根目录
   outputPath: path.resolve(__dirname, 'output.js'),
   template: true, // 是否生成词条模板
   extractOnly: false, // 是否只提取词条
