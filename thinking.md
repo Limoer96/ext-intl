@@ -18,16 +18,16 @@
 const arr = ['中文词条0'] //变量
 func('中文词条1') //函数调用
 <FormItem lable="中文词条2" /> // JSX属性
-<Desc>中文词条3</Desc> // JSX文本
+<Desc>中文词条3</Desc> // JSX元素
 const str = `${name}你好！` // 模板字符串
 ```
 上面列举了部分可能出现中文词条的情况，再加上需要排除干扰因素，使用**正则表达式**来匹配词条是非常复杂的。在不考虑性能的前提下，一般情况下词条匹配的成功率不高。
 
 提取到词条后，需要把词条写入`可用`的语言文件，这时就需要给每个词条添加一个`key`。关于如何生成`key`我们实践出了两套方案：
 
-> 创建多语言平台，提取出来的所有词条以及其多语言词条录入到多语言平台中，为每个词条生成唯一的key，并且可根据情况决定是否冗余词条(同一个词条多个翻译)。在生成多语言文件时，通过多语言平台提供的接口去匹配(或者使用多语言平台词条数据本地匹配)，找到`key`并填充词条输出成直接`可用`的多语言文件。
+> 提取词条后先翻译，为每个词条生成key，在生成多语言文件时通过接口请求或者使用本地词条数据匹配，找到`key`并填充词条输出成直接`可用`的多语言文件。
 
-这种情况存在一个明显的问题：提取词条后需要翻译并录入多语言平台后才能生成多语言文件，存在明显的先后关系。并且需要开发配套的多语言平台。优点：`key`由后端生成，解决词条冗余问题，方便更新。如果词条翻译需要更新，直接通过多语言平台修改，再重新生成多语言文件即可。
+这种情况存在一个明显的问题：提取词条后需要先翻译并生成词条数据后才能生成多语言文件，存在明显的先后关系。使用这种方式最好建立一个多语言平台，方便多语言翻译的维护。优点：`key`由后端（或翻译时指定）生成，可以解决词条冗余问题，更新方便。如果词条翻译需要更新，直接通过多语言平台（或修改多语言数据）修改，再重新生成多语言文件即可。
 
 > 提取词条时直接生成`key`，并同时生成可用的中文多语言文件以及多语言模板，后续只需要将翻译填写到多语言模板即可。
 
@@ -62,41 +62,27 @@ ts.forEachChild(ast, visit)
 function visit(node: ts.Node) {
     switch(node.kind) {
       case ts.SyntaxKind.StringLiteral: {
-        const { text, pos, end } = node as ts.StringLiteral
+        const { text, pos, end } = node as ts.StringLiteral;
         if (text.match(DOUBLE_BYTE_REGEX)) {
-          if(!extractOnly) {
-            const parentNodeKind = node.parent.kind
-            if (parentNodeKind === ts.SyntaxKind.CallExpression) {
-              // 192 CallExpression 函数调用
-              replacementList.push({
-                pos,
-                end,
-                text: `I18N.${key}${index}`
-              })
-            } else if (parentNodeKind === ts.SyntaxKind.JsxAttribute) {
-              // 268 JsxAttribute JSX属性
-              replacementList.push({
-                pos,
-                end,
-                text: `{I18N.${key}${index}}`
-              })
-            } else {
-              // 其他类型例如赋值等，直接替换
-              replacementList.push({
-                pos,
-                end,
-                text: `I18N.${key}${index}`
-              })
-            }
+          if (!extractOnly) {
+            const parentNodeKind = node.parent.kind;
+            replacementList.push({
+              pos,
+              end,
+              text:
+                parentNodeKind === ts.SyntaxKind.JsxAttribute
+                  ? `{I18N.${key}${index}}`
+                  : `I18N.${key}${index}`
+            });
           }
           matches.push({
             key: `${key}${index}`,
             value: text,
             comment: `/** ${text} **/`
-          })
-          index += 1
+          });
+          index += 1;
         }
-        break
+        break;
       }
       ... // 其他情况略
     }
@@ -131,3 +117,14 @@ export function printToFile(file: string, replaceList: ReplacementItem[], filena
   fs.writeFileSync(filename, file)
 }
 ```
+
+### 其它
+
+基于上面的想法，开发了一个专门用于提取中文词条的工具[ext-intl](https://www.npmjs.com/package/ext-intl)，基本能够完成词条提取，生成单一语言文件，原处替换。
+
+目前还存在的一些问题：
+
+* 拼接字符串， `'总计：' + count + '元'`会被识别成多个单独的字符串
+* 模板字符串，由于模板字符串的替换因使用的国际化方案不同，目前暂时不支持原处替换
+* 提取的词条可能会丢失部分标点符号
+
