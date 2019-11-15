@@ -3,5 +3,5 @@ var path = require('path');
 fd.traverse({
   outputPath: path.resolve(__dirname, 'output.js'),
   rootPath: path.resolve(__dirname, 'testdir'),
-  template: false
+  template: true
 })

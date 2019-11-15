@@ -1,4 +1,4 @@
-### 关于国际化的一些想法
+## 关于国际化的一些想法
 
 > 一个已经开发完成`React`应用国际化一般分为三个步骤：
 
@@ -10,6 +10,7 @@
 
 第二步的繁琐程度往往取决于应用的大小，词条较少可以手动提取，并给词条设置一个唯一的`key`（视情况而定）。如果词条很多，提取词条需要花费大量人力，还可能遗漏词条。这时往往需要工具来进行词条提取的操作。
 
+### 词条提取（基于正则匹配）
 
 提取词条（例如提取中文）就是从文件中找出所有中文词条，所以此类工具可以完全基于文件操作来做：将每一个文件读入，并使用**正则表达式**来匹配中文，最后返回词条即可。这种基于文件操作的方案可靠程度完全取决于**正则表达式**，因为需要考虑源码中的干扰因素，例如：*单行注释*，*多行注释*等等，还要考虑中文词条出现的位置：
 
@@ -34,28 +35,29 @@ const str = `${name}你好！` // 模板字符串
 
 既然使用基于**正则匹配**的方法提取词条如此复杂，下面介绍一种更简单可靠的方法。
 
+### 词条提取（基于AST）
 > 简单来说就是：读取文件，转成`AST`，再对`AST`进行遍历，提取中文。
 
 如何将源码转成`AST`有很多现成的工具和库，这里以`TypeScript`提供的方法为例。
 
-第一步：读取文件为字符串
+#### 第一步：读取文件为字符串
 ```js
 const text = fs.readFileSync(pathName).toString(); // buffer to string
 ```
-第二步：调用`ts.createSourceFile`创建`AST`
+#### 第二步：调用`ts.createSourceFile`创建`AST`
 
 ```js
   const ast = ts.createSourceFile('', text, ts.ScriptTarget.ES2015, true, ts.ScriptKind.TSX)
 ```
 注：第一个参数`filename`
 
-第三步：遍历`AST`
+#### 第三步：遍历`AST`
 ```js
 ts.forEachChild(ast, visit)
 ```
 调用`forEachChild`此次遍历`AST`中的每个节点，第二个参数`visit`是对每个节点处理的具体的逻辑
 
-第四步：提取中文
+#### 第四步：提取中文
 ```js
 function visit(node: ts.Node) {
     switch(node.kind) {
@@ -101,7 +103,31 @@ function visit(node: ts.Node) {
     ts.forEachChild(node, visit)
   }
 ```
-`ts.SyntaxKind`定义了数百种语法类型，这里以`StringLiteral`(字符串字面值)为例，对于所有该类型的节点，对其`text`属性进行中文正则匹配，提取词条。如果需要原处替换，则需要进一步判断，字符串是存在`CallExpression`中还是`JsxAttribute`中，这里有两种方式，第一种是更新节点，可以直接调用`ts.update*`来更新，`AST`遍历完成后通过`ts.createPrinter`将`AST`转成字符串再写入到文件；另一种则是保存词条的位置和将要替换成的文本，当`AST`遍历完后再通过字符串替换的方式替换。
+`ts.SyntaxKind`定义了数百种语法类型，这里以`StringLiteral`(字符串字面值)为例，对于所有该类型的节点，对其`text`属性进行中文正则匹配，提取词条。
 
-至此，国际化的三个步骤已经介绍完了
+### 原处替换
 
+一般来说，提取词条和词条原处替换是一起进行的。
+
+接上节，如果需要原处替换，则需要进一步判断，字符串是存在`CallExpression`中还是`JsxAttribute`中，这里有两种方式：
+
+1. 第一种是更新节点，可以直接调用`ts.update*`来更新（这种方式没目前尝试），`AST`遍历完成后通过`ts.createPrinter`将`AST`转成字符串再写入到文件；
+
+2. 另一种则是保存词条的位置和将要替换成的文本，当`AST`遍历完后再通过字符串替换的方式替换。
+   
+关于第二种方式，我们需要记录词条的位置，也就是`node`的`pos`和`end`，这里的位置和文件读取成字符串的位置是一致的，所以我们可以这样写：
+
+```js
+file.substring(0, pos) + text + file.substring(end)
+```
+这样就完成了一个词条的原处替换。但需要注意的是，因为我们并没有改变`AST`，所以修改文件字符串后可能会导致位置不对应的做法，更好的方式是保存每个词条的位置，待`AST`遍历完后再**从后往前**替换。
+```js
+export function printToFile(file: string, replaceList: ReplacementItem[], filename: string) {
+  replaceList.sort((a, b) => b.pos - a.pos) // 按照位置从大到小排序
+  for(const item of replaceList) {
+    const { pos, end, text } = item
+    file = file.substring(0, pos) + text + file.substring(end)
+  }
+  fs.writeFileSync(filename, file)
+}
+```

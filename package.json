@@ -14,10 +14,12 @@
     "extintl": "client.js"
   },
   "license": "MIT",
+  "dependencies": {
+    "typescript": "^3.2.2"
+  },
   "devDependencies": {
     "@types/node": "^10.12.14",
-    "ts-node": "^7.0.1",
-    "typescript": "^3.2.2"
+    "ts-node": "^7.0.1"
   },
   "keywords": [
     "react-intl",

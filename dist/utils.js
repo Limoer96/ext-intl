@@ -10,7 +10,7 @@ var fs = require("fs");
  */
 function removeFileComment(code, fileName) {
     var printer = ts.createPrinter({ removeComments: true });
-    var sourceFile = ts.createSourceFile('', code, ts.ScriptTarget.ES2015, true, fileName.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
+    var sourceFile = ts.createSourceFile("", code, ts.ScriptTarget.ES2015, true, fileName.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
     return printer.printFile(sourceFile);
 }
 exports.removeFileComment = removeFileComment;
@@ -29,12 +29,12 @@ function upperCase(str, idx) {
 function genKey(filePath) {
     var _a = path.parse(filePath), name = _a.name, dir = _a.dir;
     var spliter = /[\/\\\\]/;
-    dir = dir.replace(/.*:/, ''); // 去除windows下的盘符
+    dir = dir.replace(/.*:/, ""); // 去除windows下的盘符
     var paths = dir.split(spliter);
-    var id = paths.indexOf('src');
+    var id = paths.indexOf("src");
     paths.splice(0, id + 1); //删除src以外所有路径
     paths.push(name);
-    return paths.map(function (item, idx) { return upperCase(item, idx); }).join('');
+    return paths.map(function (item, idx) { return upperCase(item, idx); }).join("");
 }
 exports.genKey = genKey;
 /**
@@ -53,3 +53,24 @@ function printToFile(file, replaceList, filename) {
     fs.writeFileSync(filename, file);
 }
 exports.printToFile = printToFile;
+/**
+ * 处理匹配到的原始词条
+ * @param text 原始词条
+ * @param template 是否生成模板
+ */
+function measureText(text, template) {
+    if (template)
+        return "";
+    var res = text
+        .replace(/;/g, "")
+        .replace(/[\r\n]/g, "")
+        .replace(/\$/g, "")
+        .replace(/[`'"]/g, "");
+    return res;
+}
+exports.measureText = measureText;
+function is(obj, type) {
+    var typeString = Object.prototype.toString.call(obj);
+    return typeString.substring(8, typeString.length - 1).toLowerCase() === type;
+}
+exports.is = is;

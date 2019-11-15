@@ -1,8 +1,8 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js publish
+  C:\Program Files\nodejs\node.exe C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add typesctipt
 
 PATH: 
-  C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;D:\java\bin;D:\python;C:\Users\Administrator\AppData\Local\Android\Sdk\tools;C:\Users\Administrator\AppData\Local\Android\Sdk\platform-tools;C:\Program Files\TortoiseGit\bin;C:\Program Files\Microsoft VS Code\bin;C:\Program Files\nodejs\;D:\Git\cmd;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps;C:\Users\Administrator\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Administrator\AppData\Roaming\npm;D:\webstorm\WebStorm 2019.2.2\bin;;C:\Users\Administrator\AppData\Local\Yarn\bin;
+  C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;D:\java\bin;D:\python;C:\Users\Administrator\AppData\Local\Android\Sdk\tools;C:\Users\Administrator\AppData\Local\Android\Sdk\platform-tools;C:\Program Files\TortoiseGit\bin;C:\Program Files\Microsoft VS Code\bin;C:\Program Files\nodejs\;D:\Git\cmd;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps;C:\Users\Administrator\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Administrator\AppData\Roaming\npm;D:\webstorm\WebStorm 2019.2.2\bin;C:\Users\Administrator\AppData\Local\Yarn\bin
 
 Yarn version: 
   1.13.0
@@ -14,36 +14,56 @@ Platform:
   win32 x64
 
 Trace: 
-  Error: canceled
-      at Interface.<anonymous> (C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:125657:13)
-      at Interface.emit (events.js:198:13)
-      at Interface._ttyWrite (readline.js:801:16)
-      at ReadStream.onkeypress (readline.js:184:10)
-      at ReadStream.emit (events.js:198:13)
-      at emitKeys (internal/readline.js:424:14)
-      at emitKeys.next (<anonymous>)
-      at ReadStream.onData (readline.js:1075:36)
-      at ReadStream.emit (events.js:198:13)
-      at addChunk (_stream_readable.js:288:12)
+  Error: http://registry.npmjs.org/typesctipt: Not found
+      at Request.params.callback [as _callback] (C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:66255:18)
+      at Request.self.callback (C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:129397:22)
+      at Request.emit (events.js:198:13)
+      at Request.<anonymous> (C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:130369:10)
+      at Request.emit (events.js:198:13)
+      at IncomingMessage.<anonymous> (C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:130291:12)
+      at Object.onceWrapper (events.js:286:20)
+      at IncomingMessage.emit (events.js:203:15)
+      at endReadableNT (_stream_readable.js:1145:12)
+      at process._tickCallback (internal/process/next_tick.js:63:19)
 
 npm manifest: 
   {
     "name": "ext-intl",
-    "version": "1.0.1",
+    "version": "1.0.5",
     "description": "一个可以提取中文词条和并注入词条名到源文件名的工具",
     "main": "dist/index.js",
     "scripts": {
-      "compile": "tsc src/index.ts --outDir dist/",
-      "intl": "node dist/index.js --path ./fd.config.js"
+      "compile": "tsc src/index.ts --outDir dist/"
     },
     "files": [
-      "dist/*.js"
+      "dist/*.js",
+      "client.js"
     ],
+    "bin": {
+      "extintl": "client.js"
+    },
     "license": "MIT",
     "devDependencies": {
       "@types/node": "^10.12.14",
       "ts-node": "^7.0.1",
       "typescript": "^3.2.2"
+    },
+    "keywords": [
+      "react-intl",
+      "intl",
+      "AST",
+      "typescript"
+    ],
+    "homepage": "https://github.com/xiaomoer/ext-intl",
+    "bugs": "https://github.com/xiaomoer/ext-intl/issues",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/xiaomoer/ext-intl"
+    },
+    "author": {
+      "name": "limoer",
+      "email": "myt19960503@outlook.com",
+      "url": "https://limoer.cc"
     }
   }
 
