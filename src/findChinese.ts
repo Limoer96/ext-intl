@@ -82,8 +82,8 @@ export function findTextInTs(code: string, fileName: string) {
       case ts.SyntaxKind.TemplateExpression: {
         const { pos, end } = node;
         const templateContent = code.slice(pos, end);
-        console.log(`模板字符串：${fileName} ${templateContent} 无法处理`);
         if (templateContent.match(DOUBLE_BYTE_REGEX)) {
+          console.warn(`模板字符串：${fileName} ${templateContent} 无法处理`);
           matches.push({
             key: `${key}${index++}`,
             value: templateContent,

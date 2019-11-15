@@ -65,8 +65,8 @@ function findTextInTs(code, fileName) {
             case ts.SyntaxKind.TemplateExpression: {
                 var pos = node.pos, end = node.end;
                 var templateContent = code.slice(pos, end);
-                console.log("\u6A21\u677F\u5B57\u7B26\u4E32\uFF1A" + fileName + " " + templateContent + " \u65E0\u6CD5\u5904\u7406");
                 if (templateContent.match(DOUBLE_BYTE_REGEX)) {
+                    console.warn("\u6A21\u677F\u5B57\u7B26\u4E32\uFF1A" + fileName + " " + templateContent + " \u65E0\u6CD5\u5904\u7406");
                     matches.push({
                         key: "" + key + index++,
                         value: templateContent,
