@@ -1,5 +1,5 @@
+import i18n from '@/i18n';
 import React, { Fragment } from 'react'
-
 import { Form, Input, Cascader, Button, Radio, DatePicker, Select, message } from 'antd'
 import moment from 'moment'
 import { IDispatch } from '@/models/connect'
@@ -56,10 +56,10 @@ class RegistrationForm extends React.Component<RegistProps> {
     e.preventDefault()
     const { name, buyTime, vinCode, brand } = this.props
     const checkedList = [
-      { key: 'name', value: name.value, errMsg: '请输入姓名' },
-      { key: 'buyTime', value: buyTime.value, errMsg: '请输入购车时间' },
-      { key: 'vinCode', value: vinCode.value, errMsg: '请填写VIN号' },
-      { key: 'brand', value: brand.value, errMsg: '请填写产品品牌' }
+      { key: 'name', value: name.value, errMsg:I18N.WwwFd1FdTestdirXxx1 },
+      { key: 'buyTime', value: buyTime.value, errMsg:I18N.WwwFd1FdTestdirXxx2 },
+      { key: 'vinCode', value: vinCode.value, errMsg:I18N.WwwFd1FdTestdirXxx3 },
+      { key: 'brand', value: brand.value, errMsg:I18N.WwwFd1FdTestdirXxx4 }
     ]
     const checkedResult = {}
     checkedList.forEach(item => {
@@ -80,7 +80,7 @@ class RegistrationForm extends React.Component<RegistProps> {
     this.props.dispatch({
       type: `${namespace}/saveUserProfile`,
       callback: () => {
-        message.success('新增用户成功！', 1)
+        message.success(I18N.WwwFd1FdTestdirXxx5, 1)
         this.props.history.goBack()
       }
     })
@@ -217,12 +217,11 @@ class RegistrationForm extends React.Component<RegistProps> {
     return (
       <Fragment>
         <Form {...formItemLayout}>
-          <p className={styles.ignoreSubTitle}>基本信息</p>
+          <p className={styles.ignoreSubTitle}>{ I18N.WwwFd1FdTestdirXxx6 }</p>
           <Form.Item
             label={
               <span>
-                <span className={styles.requiredPrefix}>*</span>电话
-              </span>
+                <span className={styles.requiredPrefix}>*</span>{ I18N.WwwFd1FdTestdirXxx7 }</span>
             }
           >
             {this.props.phone.value}
@@ -230,55 +229,53 @@ class RegistrationForm extends React.Component<RegistProps> {
           <Form.Item
             label={
               <span>
-                <span className={styles.requiredPrefix}>*</span>姓名
-              </span>
+                <span className={styles.requiredPrefix}>*</span>{ I18N.WwwFd1FdTestdirXxx8 }</span>
             }
             validateStatus={name.validateStatus}
             help={name.errorMsg}
           >
             <Input
-              placeholder="请输入姓名"
+              placeholder={I18N.WwwFd1FdTestdirXxx9}
               value={name.value}
-              onChange={e => this.handleInputChange('name', e.target.value, true, '请输入姓名')}
+              onChange={e => this.handleInputChange('name', e.target.value, true,I18N.WwwFd1FdTestdirXxx10)}
             />
           </Form.Item>
-          <Form.Item label="性别">
+          <Form.Item label={I18N.WwwFd1FdTestdirXxx11}>
             <Radio.Group value={sex} onChange={e => this.handleInputChange('sex', e.target.value)}>
-              <Radio value="M">男</Radio>
-              <Radio value="F">女</Radio>
+              <Radio value="M">{ I18N.WwwFd1FdTestdirXxx12 }</Radio>
+              <Radio value="F">{ I18N.WwwFd1FdTestdirXxx13 }</Radio>
             </Radio.Group>
           </Form.Item>
-          <Form.Item label="生日">
+          <Form.Item label={I18N.WwwFd1FdTestdirXxx14}>
             <DatePicker
               disabledDate={disableDate}
               value={birthday ? moment(birthday) : null}
               onChange={(date, dateString) => this.handleInputChange('birthday', dateString)}
             />
           </Form.Item>
-          <Form.Item label="职业">
+          <Form.Item label={I18N.WwwFd1FdTestdirXxx15}>
             <Input
-              placeholder="请填写职业信息"
+              placeholder={I18N.WwwFd1FdTestdirXxx16}
               value={professional}
               onChange={e => this.handleInputChange('professional', e.target.value)}
             />
           </Form.Item>
-          <Form.Item label="地址">
+          <Form.Item label={I18N.WwwFd1FdTestdirXxx17}>
             <Cascader
               value={district}
               onChange={value => this.handleInputChange('district', value)}
-              placeholder="请选择省/市/区"
+              placeholder={I18N.WwwFd1FdTestdirXxx18}
               options={addressData}
             />
           </Form.Item>
           <Form.Item colon={false} label=" ">
-            <Input placeholder="请输入详细地址" value={house} onChange={e => this.handleInputChange('house', e.target.value)} />
+            <Input placeholder={I18N.WwwFd1FdTestdirXxx19} value={house} onChange={e => this.handleInputChange('house', e.target.value)} />
           </Form.Item>
-          <p className={styles.ignoreSubTitle}>车辆信息</p>
+          <p className={styles.ignoreSubTitle}>{ I18N.WwwFd1FdTestdirXxx20 }</p>
           <Form.Item
             label={
               <span>
-                <span className={styles.requiredPrefix}>*</span>购买日期
-              </span>
+                <span className={styles.requiredPrefix}>*</span>{ I18N.WwwFd1FdTestdirXxx21 }</span>
             }
             validateStatus={buyTime.validateStatus}
             help={buyTime.errorMsg}
@@ -286,22 +283,21 @@ class RegistrationForm extends React.Component<RegistProps> {
             <DatePicker
               disabledDate={disableDate}
               value={buyTime.value ? moment(buyTime.value) : null}
-              onChange={(date, dateString) => this.handleInputChange('buyTime', dateString, true, '请输入购买日期')}
+              onChange={(date, dateString) => this.handleInputChange('buyTime', dateString, true,I18N.WwwFd1FdTestdirXxx22)}
             />
           </Form.Item>
           <Form.Item
             label={
               <span>
-                <span className={styles.requiredPrefix}>*</span>产品品牌
-              </span>
+                <span className={styles.requiredPrefix}>*</span>{ I18N.WwwFd1FdTestdirXxx23 }</span>
             }
             validateStatus={brand.validateStatus}
             help={brand.errorMsg}
           >
             <Select
-              placeholder="请选择产品品牌"
+              placeholder={I18N.WwwFd1FdTestdirXxx24}
               value={brand.value}
-              onChange={value => this.handleBrandChange(value, '请选择产品品牌')}
+              onChange={value => this.handleBrandChange(value,I18N.WwwFd1FdTestdirXxx25)}
             >
               {categoryList &&
                 categoryList.map(({ brandName, sellerBrandId }) => (
@@ -314,37 +310,36 @@ class RegistrationForm extends React.Component<RegistProps> {
           <Form.Item
             label={
               <span>
-                <span className={styles.requiredPrefix}>*</span>车架号
-              </span>
+                <span className={styles.requiredPrefix}>*</span>{ I18N.WwwFd1FdTestdirXxx26 }</span>
             }
             validateStatus={vinCode.validateStatus}
             help={vinCode.errorMsg}
           >
             <Input
               disabled={!brand.value}
-              placeholder="请填写车架号"
+              placeholder={I18N.WwwFd1FdTestdirXxx27}
               value={vinCode.value}
-              onChange={e => this.handleInputChange('vinCode', e.target.value, true, '请填写车架号')}
+              onChange={e => this.handleInputChange('vinCode', e.target.value, true,I18N.WwwFd1FdTestdirXxx28)}
               onBlur={this.checkExistVinCode}
             />
           </Form.Item>
-          <Form.Item label="车辆型号">
+          <Form.Item label={I18N.WwwFd1FdTestdirXxx29}>
             <Input
               disabled={this.checkFieldDisable('vehicleType')}
-              placeholder="请填写车辆型号"
+              placeholder={I18N.WwwFd1FdTestdirXxx30}
               value={vehicleType}
               onChange={e => this.handleInputChange('vehicleType', e.target.value)}
             />
           </Form.Item>
-          <Form.Item label="发动机号">
+          <Form.Item label={I18N.WwwFd1FdTestdirXxx31}>
             <Input
               disabled={this.checkFieldDisable('motroCode')}
-              placeholder="请填写发动机号"
+              placeholder={I18N.WwwFd1FdTestdirXxx32}
               value={motorCode}
               onChange={e => this.handleInputChange('motorCode', e.target.value)}
             />
           </Form.Item>
-          <Form.Item label="出厂日期">
+          <Form.Item label={I18N.WwwFd1FdTestdirXxx33}>
             <DatePicker
               disabled={this.checkFieldDisable('manufactureDate')}
               disabledDate={disableDate}
@@ -352,10 +347,10 @@ class RegistrationForm extends React.Component<RegistProps> {
               onChange={(date, dateString) => this.handleInputChange('manufactureDate', dateString)}
             />
           </Form.Item>
-          <p className={styles.ignoreSubTitle}>备注信息</p>
-          <Form.Item label="备注信息">
+          <p className={styles.ignoreSubTitle}>{ I18N.WwwFd1FdTestdirXxx34 }</p>
+          <Form.Item label={I18N.WwwFd1FdTestdirXxx35}>
             <Input.TextArea
-              placeholder="备注信息不超过500字"
+              placeholder={I18N.WwwFd1FdTestdirXxx36}
               maxLength={500}
               autosize={{ minRows: 3, maxRows: 5 }}
               value={comment}
@@ -363,12 +358,8 @@ class RegistrationForm extends React.Component<RegistProps> {
             />
           </Form.Item>
           <Form.Item {...tailFormItemLayout}>
-            <Button className={styles.cancelBtn} onClick={this.goBack}>
-              返回
-            </Button>
-            <Button className={styles.btn} type="primary" onClick={this.handleSubmit}>
-              保存
-            </Button>
+            <Button className={styles.cancelBtn} onClick={this.goBack}>{ I18N.WwwFd1FdTestdirXxx37 }</Button>
+            <Button className={styles.btn} type="primary" onClick={this.handleSubmit}>{ I18N.WwwFd1FdTestdirXxx38 }</Button>
           </Form.Item>
         </Form>
         <OutBoundRemarkModal />

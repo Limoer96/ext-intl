@@ -42,13 +42,19 @@ exports.genKey = genKey;
  * @param file 文件的字符串形式
  * @param replaceList 待替换的元素列表
  * @param filename 待写入文件路径
+ * @param prefix 可写入到源文件中的顶部字符串，一般为包引入等
  */
-function printToFile(file, replaceList, filename) {
+function printToFile(file, replaceList, filename, prefix) {
+    if (replaceList.length === 0)
+        return;
     replaceList.sort(function (a, b) { return b.pos - a.pos; }); // 按照位置从大到小排序
     for (var _i = 0, replaceList_1 = replaceList; _i < replaceList_1.length; _i++) {
         var item = replaceList_1[_i];
         var pos = item.pos, end = item.end, text = item.text;
         file = file.substring(0, pos) + text + file.substring(end);
+    }
+    if (prefix) {
+        file = prefix + file;
     }
     fs.writeFileSync(filename, file);
 }

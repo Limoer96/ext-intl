@@ -12,9 +12,7 @@ let whiteListFileType = [".ts", ".tsx", ".js", ".jsx"];
  * @param {string[]} textArr 当前文件中文数组
  */
 function writeFile(textArr: Text[], targetFilePath: string) {
-  const { template, mode } = <IConfig>(
-    global["intlConfig"]
-  );
+  const { template, mode } = <IConfig>global["intlConfig"];
   if (textArr.length === 0) return;
   let textStr = textArr
     .map(
@@ -25,33 +23,34 @@ function writeFile(textArr: Text[], targetFilePath: string) {
         )}',`
     )
     .join("\n");
-  if (mode === 'sample') {
+  if (mode === "sample") {
     textStr = "\n" + textStr;
   } else {
-    textStr = "export default {\n" + textStr + "\n}"
+    textStr = "export default {\n" + textStr + "\n}";
   }
-  const write = mode === 'sample' ? fs.appendFileSync : fs.writeFileSync
+  const write = mode === "sample" ? fs.appendFileSync : fs.writeFileSync;
   try {
-    write(targetFilePath, textStr)
+    write(targetFilePath, textStr);
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 }
 
 function writeFileDepth(textArr: Text[], filename: string) {
-  const { outputPath, rootPath } = <IConfig>global["intlConfig"]
-  const fileRelativePath = filename.replace(rootPath, '').substring(1)
-  const targetFilePath = path.resolve(outputPath, fileRelativePath)
-  writeFile(textArr, targetFilePath)
+  const { outputPath, rootPath } = <IConfig>global["intlConfig"];
+  const fileRelativePath = filename.replace(rootPath, "").substring(1);
+  const targetFilePath = path.resolve(outputPath, fileRelativePath);
+  writeFile(textArr, targetFilePath);
 }
 
 interface IConfig {
-  outputPath: string
-  rootPath: string
-  template: boolean
-  extractOnly: boolean
-  whiteList: string[]
-  mode?: 'sample' | 'depth' // 模式类型 简单模式/深层次导出
+  outputPath: string;
+  rootPath: string;
+  template: boolean;
+  extractOnly: boolean;
+  whiteList: string[];
+  mode?: "sample" | "depth"; // 模式类型 简单模式/深层次导出
+  prefix?: string;
 }
 
 function init(config: IConfig) {
@@ -62,7 +61,7 @@ function init(config: IConfig) {
   }
   delete config.whiteList;
   global["intlConfig"] = config;
-  if (mode === 'sample') {
+  if (mode === "sample") {
     try {
       fs.writeFileSync(outputPath, "export default {");
     } catch (error) {
@@ -70,10 +69,10 @@ function init(config: IConfig) {
     }
   } else {
     fs.mkdir(outputPath, err => {
-      if(err && err.code !== 'EEXIST') {
-        console.log(`创建多语言目录${outputPath}失败！`)
+      if (err && err.code !== "EEXIST") {
+        console.log(`创建多语言目录${outputPath}失败！`);
       }
-    })
+    });
   }
 }
 
@@ -86,13 +85,13 @@ function init(config: IConfig) {
 function traverseDir(pathName: string, outputPath: string) {
   if (fs.statSync(pathName).isFile()) {
     if (!whiteListFileType.includes(path.extname(pathName))) return;
-    const { mode } = <IConfig>global["intlConfig"]
+    const { mode } = <IConfig>global["intlConfig"];
     const text = fs.readFileSync(pathName).toString(); // buffer to string
     const result = findTextInTs(text, pathName);
-    if (mode === 'sample') {
+    if (mode === "sample") {
       writeFile(result, outputPath);
     } else {
-      writeFileDepth(result, pathName)
+      writeFileDepth(result, pathName);
     }
   } else {
     // 文件夹
@@ -107,7 +106,7 @@ function traverseDir(pathName: string, outputPath: string) {
 export function traverse(config: IConfig) {
   init(config);
   traverseDir(config.rootPath, config.outputPath);
-  if (config.mode === 'sample') {
+  if (config.mode === "sample") {
     fs.appendFileSync(config.outputPath, "\n}");
   }
   console.timeEnd("总计用时：");

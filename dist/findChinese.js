@@ -5,7 +5,7 @@ var utils_1 = require("./utils");
 var DOUBLE_BYTE_REGEX = /[^\x00-\xff]/g;
 // see from https://github.com/alibaba/kiwi/blob/master/kiwi-linter/src/findChineseText.ts
 function findTextInTs(code, fileName) {
-    var extractOnly = global["intlConfig"].extractOnly;
+    var _a = global["intlConfig"], extractOnly = _a.extractOnly, prefix = _a.prefix;
     var matches = [];
     var replacementList = [];
     var codeString = code;
@@ -78,7 +78,7 @@ function findTextInTs(code, fileName) {
         ts.forEachChild(node, visit);
     }
     ts.forEachChild(ast, visit);
-    utils_1.printToFile(codeString, replacementList, fileName);
+    utils_1.printToFile(codeString, replacementList, fileName, prefix);
     return matches;
 }
 exports.findTextInTs = findTextInTs;

@@ -15,7 +15,7 @@ export interface Text {
 
 // see from https://github.com/alibaba/kiwi/blob/master/kiwi-linter/src/findChineseText.ts
 export function findTextInTs(code: string, fileName: string) {
-  const { extractOnly } = global["intlConfig"];
+  const { extractOnly, prefix } = global["intlConfig"];
   const matches: Array<Text> = [];
   const replacementList: Array<ReplacementItem> = [];
   let codeString = code;
@@ -95,6 +95,6 @@ export function findTextInTs(code: string, fileName: string) {
     ts.forEachChild(node, visit);
   }
   ts.forEachChild(ast, visit);
-  printToFile(codeString, replacementList, fileName);
+  printToFile(codeString, replacementList, fileName, prefix);
   return matches;
 }

@@ -52,16 +52,22 @@ export interface ReplacementItem {
  * @param file 文件的字符串形式
  * @param replaceList 待替换的元素列表
  * @param filename 待写入文件路径
+ * @param prefix 可写入到源文件中的顶部字符串，一般为包引入等
  */
 export function printToFile(
   file: string,
   replaceList: ReplacementItem[],
-  filename: string
+  filename: string,
+  prefix?: string
 ) {
+  if (replaceList.length === 0) return;
   replaceList.sort((a, b) => b.pos - a.pos); // 按照位置从大到小排序
   for (const item of replaceList) {
     const { pos, end, text } = item;
     file = file.substring(0, pos) + text + file.substring(end);
+  }
+  if (prefix) {
+    file = prefix + file;
   }
   fs.writeFileSync(filename, file);
 }

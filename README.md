@@ -16,10 +16,13 @@
 
 ### 实现思路
 
-> 从根目录开始递归提取词条；
-> 针对每个文件，读取文件字符串，并转换成`AST`，通过遍历`AST`找到所有的中文；
-> 如果需要直接使用`key`替换源文件，则需要储存额外的中文位置信息，待统一替换；
-> 将词条写入到文件。
+1. 从根目录开始递归提取词条；
+
+2.  针对每个文件，读取文件字符串，并转换成`AST`，通过遍历`AST`找到所有的中文；
+
+3. 如果需要直接使用`key`替换源文件，则需要储存额外的中文位置信息，待统一替换；
+
+4.  将词条写入到文件。
 
 ### 使用
 
@@ -32,7 +35,9 @@ extIntl.traverse({
   rootPath: path.resolve(__dirname, 'testdir'), // 根目录
   template: false, // 是否生成词条模板
   extractOnly: true // 是否只扫描文件(不进行替换)
-  whileList: ['.ts', '.tsx']
+  whileList: ['.ts', '.tsx'],
+  mode: 'depth',
+  prefix: "import i18n from '@/i18n';\n"
 })
 ```
 
@@ -49,10 +54,12 @@ Usage: extintl [options] [<absolute path>]
 const path = require('path')
 module.exports = {
   rootPath: path.resolve(__dirname, 'testdir'), // 遍历根目录
-  outputPath: path.resolve(__dirname, 'output.js'),
+  outputPath: path.resolve(__dirname, 'i18n'), // 指定输入的目录
   template: true, // 是否生成词条模板
   extractOnly: false, // 是否只提取词条
   whiteList: ['.ts', '.tsx', '.js', '.jsx'] // 白名单文件类型
+  mode: 'depth',
+  prefix: "import i18n from '@/i18n';\n"
 }
 ```
 ### API
@@ -65,10 +72,12 @@ module.exports = {
 function traverse(config){...}
 
 interface IConfig {
-  outputPath: string // 词条输出文件(绝对路径)
+  outputPath: string // 词条输出文件/目录(绝对路径)
   rootPath: string // 根目录(绝对路径)
-  template: boolean, // 是否生成语言模板
-  extractOnly: boolean, // 是否只提取词条(false:将会替换源文件本身，慎用)
-  whiteList: string[] // 白名单文件类型 默认为: ['.ts', '.tsx', '.js', '.jsx']
+  template: boolean // 是否生成语言模板
+  extractOnly: boolean // 是否只提取词条(false:将会替换源文件本身，慎用)
+  whiteList?: string[] // 白名单文件类型 默认为: ['.ts', '.tsx', '.js', '.jsx']
+  mode?: "sample" | "depth" // 模式类型 简单模式(导出成单个文件)/深层次导出(按照源码层级导出到不同文件)
+  prefix?: string // 原处修改时一般用于添加`import`语句等
 }
 ```

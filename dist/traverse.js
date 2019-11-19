@@ -12,7 +12,7 @@ var whiteListFileType = [".ts", ".tsx", ".js", ".jsx"];
  * @param {string[]} textArr 当前文件中文数组
  */
 function writeFile(textArr, targetFilePath) {
-    var _a = (global["intlConfig"]), template = _a.template, mode = _a.mode;
+    var _a = global["intlConfig"], template = _a.template, mode = _a.mode;
     if (textArr.length === 0)
         return;
     var textStr = textArr
@@ -20,13 +20,13 @@ function writeFile(textArr, targetFilePath) {
         return text.comment + "\n" + const_1.TAB + text.key + ": '" + utils_1.measureText(text.value, template) + "',";
     })
         .join("\n");
-    if (mode === 'sample') {
+    if (mode === "sample") {
         textStr = "\n" + textStr;
     }
     else {
         textStr = "export default {\n" + textStr + "\n}";
     }
-    var write = mode === 'sample' ? fs.appendFileSync : fs.writeFileSync;
+    var write = mode === "sample" ? fs.appendFileSync : fs.writeFileSync;
     try {
         write(targetFilePath, textStr);
     }
@@ -36,7 +36,7 @@ function writeFile(textArr, targetFilePath) {
 }
 function writeFileDepth(textArr, filename) {
     var _a = global["intlConfig"], outputPath = _a.outputPath, rootPath = _a.rootPath;
-    var fileRelativePath = filename.replace(rootPath, '').substring(1);
+    var fileRelativePath = filename.replace(rootPath, "").substring(1);
     var targetFilePath = path.resolve(outputPath, fileRelativePath);
     writeFile(textArr, targetFilePath);
 }
@@ -48,7 +48,7 @@ function init(config) {
     }
     delete config.whiteList;
     global["intlConfig"] = config;
-    if (mode === 'sample') {
+    if (mode === "sample") {
         try {
             fs.writeFileSync(outputPath, "export default {");
         }
@@ -58,7 +58,7 @@ function init(config) {
     }
     else {
         fs.mkdir(outputPath, function (err) {
-            if (err && err.code !== 'EEXIST') {
+            if (err && err.code !== "EEXIST") {
                 console.log("\u521B\u5EFA\u591A\u8BED\u8A00\u76EE\u5F55" + outputPath + "\u5931\u8D25\uFF01");
             }
         });
@@ -77,7 +77,7 @@ function traverseDir(pathName, outputPath) {
         var mode = global["intlConfig"].mode;
         var text = fs.readFileSync(pathName).toString(); // buffer to string
         var result = findChinese_1.findTextInTs(text, pathName);
-        if (mode === 'sample') {
+        if (mode === "sample") {
             writeFile(result, outputPath);
         }
         else {
@@ -96,7 +96,7 @@ function traverseDir(pathName, outputPath) {
 function traverse(config) {
     init(config);
     traverseDir(config.rootPath, config.outputPath);
-    if (config.mode === 'sample') {
+    if (config.mode === "sample") {
         fs.appendFileSync(config.outputPath, "\n}");
     }
     console.timeEnd("总计用时：");
