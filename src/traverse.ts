@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+const mkdirp = require('mkdirp')
 import { findTextInTs, Text } from "./findChinese";
 import { TAB } from "./const";
 import { measureText, is } from "./utils";
@@ -29,6 +30,15 @@ function writeFile(textArr: Text[], targetFilePath: string) {
     textStr = "export default {\n" + textStr + "\n}";
   }
   const write = mode === "sample" ? fs.appendFileSync : fs.writeFileSync;
+  // 判断文件夹是否存在并创建深层次文件夹
+  if (mode === 'depth') {
+    const dirname = path.dirname(targetFilePath)
+    console.log('dirname', dirname)
+    const exist = fs.existsSync(dirname)
+    if(!exist) {
+      mkdirp.sync(dirname)
+    }
+  }
   try {
     write(targetFilePath, textStr);
   } catch (error) {
