@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const args = process.argv.slice(2)
-const intl = require('./dist/index')
+const intl = require('./dist/bundle.min.js')
 
 function _findIndex(args) {
   let expected = ['--config', '-p'];
