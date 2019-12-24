@@ -33,7 +33,6 @@ function writeFile(textArr: Text[], targetFilePath: string) {
   // 判断文件夹是否存在并创建深层次文件夹
   if (mode === 'depth') {
     const dirname = path.dirname(targetFilePath)
-    console.log('dirname', dirname)
     const exist = fs.existsSync(dirname)
     if(!exist) {
       mkdirp.sync(dirname)
@@ -64,12 +63,16 @@ interface IConfig {
 }
 
 function init(config: IConfig) {
-  const { outputPath, whiteList, mode } = config;
+  const { outputPath, whiteList, mode, template } = config;
   console.time("总计用时：");
   if (is(whiteList, "array") && whiteList.length > 0) {
     whiteListFileType = whiteList;
   }
   delete config.whiteList;
+  // 生成模板时默认使用非替换模式
+  if (template) {
+    config.extractOnly = true;
+  }
   global["intlConfig"] = config;
   if (mode === "sample") {
     try {
