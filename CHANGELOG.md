@@ -16,3 +16,7 @@
 ### 1.3.2
 
 * 修复了`{template: true, extractOnly: false}`导出语言模板后内容被替换无法再次提取的问题
+
+### 1.4.0
+
+* 使用`ts transformer`API 替换先前版本字符串替换的方式
