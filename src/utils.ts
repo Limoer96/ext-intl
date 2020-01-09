@@ -48,7 +48,7 @@ export interface ReplacementItem {
   text: string | number;
 }
 /**
- * 批量文件替换
+ * 批量文件替换(已不再使用)
  * @param file 文件的字符串形式
  * @param replaceList 待替换的元素列表
  * @param filename 待写入文件路径
@@ -70,6 +70,20 @@ export function printToFile(
     file = prefix + file;
   }
   fs.writeFileSync(filename, file);
+}
+/**
+ * 转换后的文件保存到文件
+ * @param ast 转换后的ast
+ * @param fileName 文件名路径
+ * @param prefix 前缀字符串
+ */
+export function saveFile(ast: ts.SourceFile, fileName: string, prefix?: string) {
+  const printer = ts.createPrinter()
+  let file = printer.printFile(ast)
+  if (prefix) {
+    file = prefix + file
+  }
+  fs.writeFileSync(fileName, file)
 }
 
 /**

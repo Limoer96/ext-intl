@@ -1,7 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
 const mkdirp = require('mkdirp')
-import { findTextInTs, Text } from "./findChinese";
+// import { findTextInTs, Text } from "./findChinese";
+import { transformChinese, Text } from './transformer/transformChinese'
 import { TAB } from "./const";
 import { measureText, is } from "./utils";
 
@@ -100,7 +101,7 @@ function traverseDir(pathName: string, outputPath: string) {
     if (!whiteListFileType.includes(path.extname(pathName))) return;
     const { mode } = <IConfig>global["intlConfig"];
     const text = fs.readFileSync(pathName).toString(); // buffer to string
-    const result = findTextInTs(text, pathName);
+    const result = transformChinese(text, pathName);
     if (mode === "sample") {
       writeFile(result, outputPath);
     } else {
