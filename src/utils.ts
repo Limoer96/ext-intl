@@ -39,7 +39,7 @@ export function genKey(filePath: string) {
   const id = paths.indexOf("src");
   paths.splice(0, id + 1); //删除src以外所有路径
   paths.push(name);
-  return paths.map((item, idx) => upperCase(item, idx)).join("");
+  return paths.map((item, idx) => upperCase(item, idx).replace(/-/g, '')).join("");
 }
 
 export interface ReplacementItem {

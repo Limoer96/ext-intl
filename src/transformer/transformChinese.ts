@@ -57,11 +57,11 @@ export function transformChinese(code: string, fileName: string) {
           const text = code.slice(pos, end)
           if (text.match(DOUBLE_BYTE_REGEX)) {
             console.warn(`模板字符串：${fileName} ${text} 无法处理`);
-            matches.push({
-              key: name,
-              value: text,
-              comment: `/** ${text} **/`
-            })
+            // matches.push({
+            //   key: name,
+            //   value: text,
+            //   comment: `/** ${text} **/`
+            // })
           }
           break
         }
