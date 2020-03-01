@@ -77,11 +77,11 @@ export function printToFile(
  * @param fileName 文件名路径
  * @param prefix 前缀字符串
  */
-export function saveFile(ast: ts.SourceFile, fileName: string, prefix?: string) {
+export function saveFile(ast: ts.SourceFile, fileName: string, prefix?: string[]) {
   const printer = ts.createPrinter()
   let file = printer.printFile(ast)
   if (prefix) {
-    file = prefix + file
+    file = prefix.join('\n') + '\n' + file
   }
   fs.writeFileSync(fileName, file)
 }
@@ -104,4 +104,23 @@ export function measureText(text: string, template: boolean) {
 export function is(obj: any, type: string) {
   const typeString: string = Object.prototype.toString.call(obj);
   return typeString.substring(8, typeString.length - 1).toLowerCase() === type;
+}
+
+/**
+ * 获取模板字符串中的变量名
+ * @param text 模板字符串
+ */
+
+export function getVariableFromTmeplateString(text: string): string[] {
+  if (!text) {
+    return [];
+  }
+  const reg =  /\$\{(.+?)\}/g;
+  const variableList = [];
+  while(true) {
+    const result = reg.exec(text);
+    if(!result) break;
+    variableList.push(result[1]);
+  }
+  return variableList;
 }
