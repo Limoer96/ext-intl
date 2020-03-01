@@ -77,6 +77,7 @@ export function transformChinese(code: string, fileName: string) {
                 value: text.replace(/\$(?=\{)/g, ''), // 先行断言，去掉`$`
                 comment: `/** ${text} **/`
               })
+              index += 1
               // 返回新的节点(函数调用)
               const variableList: string[] = getVariableFromTmeplateString(text)
               const objParam = ts.createObjectLiteral(variableList.map(variable => ts.createPropertyAssignment(variable, ts.createIdentifier(variable))))
