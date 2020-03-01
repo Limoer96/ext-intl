@@ -25,3 +25,14 @@
 
 * 修复了文件目录可能存在`-`符号，导致生成的`key`不符合规则的问题
 * 移除对不可处理的模板字符串的词条统计
+
+### 1.5.0
+
+* 基于[react-intl-universal](https://www.npmjs.com/package/react-intl-universal)关于包含*变量*词条(模板字符串)的写法方式，新增模板字符串原地替换，举例：
+```js
+const message = `你好${visitor}，我是${name}`
+// 将被替换成
+const message = intl.get(key, { visitor, name })
+// 需要注意的是，`intl.get`将由配置`templateString.funcName`指定，可以根据项目不同选择封装适合的函数
+```
+* 考虑到多个可能的导入，`prefix`配置变成`string[]`，支持传入多个字符串

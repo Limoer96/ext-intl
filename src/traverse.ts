@@ -60,7 +60,11 @@ interface IConfig {
   extractOnly: boolean;
   whiteList: string[];
   mode?: "sample" | "depth"; // 模式类型 简单模式/深层次导出
-  prefix?: string;
+  prefix?: string[];
+  // 用于处理模板字符串的配置
+  templateString?: {
+    funcName: string
+  }
 }
 
 function init(config: IConfig) {
