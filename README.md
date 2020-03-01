@@ -97,7 +97,7 @@ interface IConfig {
 ### 配置项
 
 参数 | 说明 | 类型
--|-|-|-
+-|-|-
 outputPath | 输出词条存储绝对路径，`mode`为`sample`时，指定为文件名，`depth`指定为目录 | `string`
 rootPath | 源文件或源文件目录 | `string`
 template | 是否生成词条模板 | `boolean`
