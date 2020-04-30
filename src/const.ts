@@ -1,3 +1,3 @@
 export const TAB = " ";
 
-export const DOUBLE_BYTE_REGEX = /[^\x00-\xff]/g;
+export const DOUBLE_BYTE_REGEX: RegExp = /[^\x00-\xff]/g;

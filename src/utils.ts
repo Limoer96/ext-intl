@@ -39,7 +39,9 @@ export function genKey(filePath: string) {
   const id = paths.indexOf("src");
   paths.splice(0, id + 1); //删除src以外所有路径
   paths.push(name);
-  return paths.map((item, idx) => upperCase(item, idx).replace(/-/g, '')).join("");
+  return paths
+    .map((item, idx) => upperCase(item, idx).replace(/-/g, ""))
+    .join("");
 }
 
 export interface ReplacementItem {
@@ -77,13 +79,17 @@ export function printToFile(
  * @param fileName 文件名路径
  * @param prefix 前缀字符串
  */
-export function saveFile(ast: ts.SourceFile, fileName: string, prefix?: string[]) {
-  const printer = ts.createPrinter()
-  let file = printer.printFile(ast)
+export function saveFile(
+  ast: ts.SourceFile,
+  fileName: string,
+  prefix?: string[]
+) {
+  const printer = ts.createPrinter();
+  let file = printer.printFile(ast);
   if (prefix) {
-    file = prefix.join('\n') + '\n' + file
+    file = prefix.join("\n") + "\n" + file;
   }
-  fs.writeFileSync(fileName, file)
+  fs.writeFileSync(fileName, file);
 }
 
 /**
@@ -115,11 +121,11 @@ export function getVariableFromTmeplateString(text: string): string[] {
   if (!text) {
     return [];
   }
-  const reg =  /\$\{(.+?)\}/g;
+  const reg = /\$\{(.+?)\}/g;
   const variableList = [];
-  while(true) {
+  while (true) {
     const result = reg.exec(text);
-    if(!result) break;
+    if (!result) break;
     variableList.push(result[1]);
   }
   return variableList;

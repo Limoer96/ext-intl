@@ -1,14 +1,11 @@
-import typescript from 'rollup-plugin-typescript';
-import { uglify } from 'rollup-plugin-uglify'
+import typescript from "rollup-plugin-typescript2";
+// import { terser } from "rollup-plugin-terser";
 
 export default {
   input: "src/index.ts",
   output: {
-    file: "dist/bundle.min.js",
-    format: "cjs"
+    file: "dist/index.js",
+    format: "cjs",
   },
-  plugins: [
-    typescript({ lib: ["es6"], target: "es5" }),
-    uglify()
-  ]
-}
+  plugins: [typescript()],
+};

@@ -1,25 +1,25 @@
 import * as fs from "fs";
 import * as path from "path";
-const mkdirp = require('mkdirp')
-// import { findTextInTs, Text } from "./findChinese";
-import { transformChinese, Text } from './transformer/transformChinese'
+const mkdirp = require("mkdirp");
+import { transformChinese, Text } from "./transformer/transformChinese";
 import { TAB } from "./const";
 import { measureText, is } from "./utils";
+const prettier = require("prettier");
 
-let whiteListFileType = [".ts", ".tsx", ".js", ".jsx"];
+let whiteListFileType: string[] = [".ts", ".tsx", ".js", ".jsx"];
 
 /**
  *写入到文件
  *
  * @param {string[]} textArr 当前文件中文数组
  */
-function writeFile(textArr: Text[], targetFilePath: string) {
+function writeFile(textArr: Text[], targetFilePath: string): void {
   const { template, mode } = <IConfig>global["intlConfig"];
   if (textArr.length === 0) return;
   let textStr = textArr
     .map(
-      text =>
-        `${text.comment}\n${TAB}${text.key}: '${measureText(
+      (text) =>
+        `${text.comment}${TAB}${text.key}: '${measureText(
           text.value,
           template
         )}',`
@@ -32,21 +32,24 @@ function writeFile(textArr: Text[], targetFilePath: string) {
   }
   const write = mode === "sample" ? fs.appendFileSync : fs.writeFileSync;
   // 判断文件夹是否存在并创建深层次文件夹
-  if (mode === 'depth') {
-    const dirname = path.dirname(targetFilePath)
-    const exist = fs.existsSync(dirname)
-    if(!exist) {
-      mkdirp.sync(dirname)
+  if (mode === "depth") {
+    const dirname = path.dirname(targetFilePath);
+    const exist = fs.existsSync(dirname);
+    if (!exist) {
+      mkdirp.sync(dirname);
     }
   }
   try {
+    if (mode === "depth") {
+      textStr = prettier.format(textStr, { parser: "babel" });
+    }
     write(targetFilePath, textStr);
   } catch (error) {
     console.log(error);
   }
 }
 
-function writeFileDepth(textArr: Text[], filename: string) {
+function writeFileDepth(textArr: Text[], filename: string): void {
   const { outputPath, rootPath } = <IConfig>global["intlConfig"];
   const fileRelativePath = filename.replace(rootPath, "").substring(1);
   const targetFilePath = path.resolve(outputPath, fileRelativePath);
@@ -63,8 +66,8 @@ interface IConfig {
   prefix?: string[];
   // 用于处理模板字符串的配置
   templateString?: {
-    funcName: string
-  }
+    funcName: string;
+  };
 }
 
 function init(config: IConfig) {
@@ -86,7 +89,7 @@ function init(config: IConfig) {
       console.log(`新建多语言文件${outputPath}失败！`);
     }
   } else {
-    fs.mkdir(outputPath, err => {
+    fs.mkdir(outputPath, (err) => {
       if (err && err.code !== "EEXIST") {
         console.log(`创建多语言目录${outputPath}失败！`);
       }
@@ -114,11 +117,16 @@ function traverseDir(pathName: string, outputPath: string) {
   } else {
     // 文件夹
     const files = fs.readdirSync(pathName);
-    files.forEach(file => {
+    files.forEach((file) => {
       const absPath = path.resolve(pathName, file);
       traverseDir(absPath, outputPath);
     });
   }
+}
+
+function formatFile(filePath: string) {
+  const rawData = fs.readFileSync(filePath, "utf8");
+  fs.writeFileSync(filePath, prettier.format(rawData, { parser: "babel" }));
 }
 
 export function traverse(config: IConfig) {
@@ -126,6 +134,7 @@ export function traverse(config: IConfig) {
   traverseDir(config.rootPath, config.outputPath);
   if (config.mode === "sample") {
     fs.appendFileSync(config.outputPath, "\n}");
+    formatFile(config.outputPath);
   }
   console.timeEnd("总计用时：");
 }
