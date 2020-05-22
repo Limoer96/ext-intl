@@ -16,6 +16,12 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@types/chalk": "^2.2.0",
+    "@types/inquirer": "^6.5.0",
+    "@types/mkdirp": "^1.0.0",
+    "@types/prettier": "^2.0.1",
+    "chalk": "^4.0.0",
+    "inquirer": "^7.1.0",
     "mkdirp": "^0.5.1",
     "prettier": "^2.0.5",
     "typescript": "^3.9.3"

@@ -119,3 +119,11 @@ export function getVariableFromTmeplateString(text: string): string[] {
   }
   return variableList
 }
+
+/**
+ * 生成绝对路径
+ * @param pathName
+ */
+export function resolvePath(pathName) {
+  return path.resolve(process.cwd(), pathName)
+}

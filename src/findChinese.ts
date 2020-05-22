@@ -1,5 +1,5 @@
 import * as ts from 'typescript'
-import { removeFileComment, genKey, printToFile, ReplacementItem } from './utils'
+import { removeFileComment, genKey, printToFile, ReplacementItem } from './utils/common'
 
 const DOUBLE_BYTE_REGEX = /[^\x00-\xff]/g
 export interface Text {

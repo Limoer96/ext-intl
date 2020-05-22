@@ -1,27 +1,17 @@
 import * as ts from 'typescript'
-import { DOUBLE_BYTE_REGEX } from '../const'
-import { genKey, removeFileComment, saveFile, getVariableFromTmeplateString } from '../utils'
+import { DOUBLE_BYTE_REGEX, IConfig } from '../constant'
+import { genKey, removeFileComment, saveFile, getVariableFromTmeplateString } from '../utils/common'
 
 export interface Text {
   key: string
   value: string
   comment: string
 }
-
-interface IConfig {
-  outputPath: string
-  rootPath: string
-  template: boolean
-  extractOnly: boolean
-  whiteList: string[]
-  mode?: 'sample' | 'depth' // 模式类型 简单模式/深层次导出
-  prefix?: string[]
-  // 用于处理模板字符串的配置
-  templateString?: {
-    funcName: string
-  }
-}
-
+/**
+ * 在源文件中查找中文词条
+ * @param code 源代码
+ * @param fileName 当前文件路径名
+ */
 export function transformChinese(code: string, fileName: string) {
   const { extractOnly, prefix, templateString } = <IConfig>global['intlConfig']
   const matches: Array<Text> = []

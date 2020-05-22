@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
+    "module": "CommonJS",
     "target": "es6",
     "outDir": "dist",
     "declaration": true,
@@ -9,5 +9,5 @@
     "sourceMap": true,
     "rootDir": "src"
   },
-  "exclude": ["node_modules", ".vscode-test"]
+  "exclude": ["node_modules", ".vscode-test", "dist"]
 }
