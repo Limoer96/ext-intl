@@ -1,12 +1,12 @@
-import * as fs from "fs";
-import * as path from "path";
-const mkdirp = require("mkdirp");
-import { transformChinese, Text } from "./transformer/transformChinese";
-import { TAB } from "./const";
-import { measureText, is } from "./utils";
-const prettier = require("prettier");
+import * as fs from 'fs'
+import * as path from 'path'
+const mkdirp = require('mkdirp')
+import { transformChinese, Text } from './transformer/transformChinese'
+import { TAB } from './const'
+import { measureText, is } from './utils'
+const prettier = require('prettier')
 
-let whiteListFileType: string[] = [".ts", ".tsx", ".js", ".jsx"];
+let whiteListFileType: string[] = ['.ts', '.tsx', '.js', '.jsx']
 
 /**
  *写入到文件
@@ -14,86 +14,80 @@ let whiteListFileType: string[] = [".ts", ".tsx", ".js", ".jsx"];
  * @param {string[]} textArr 当前文件中文数组
  */
 function writeFile(textArr: Text[], targetFilePath: string): void {
-  const { template, mode } = <IConfig>global["intlConfig"];
-  if (textArr.length === 0) return;
+  const { template, mode } = <IConfig>global['intlConfig']
+  if (textArr.length === 0) return
   let textStr = textArr
-    .map(
-      (text) =>
-        `${text.comment}${TAB}${text.key}: '${measureText(
-          text.value,
-          template
-        )}',`
-    )
-    .join("\n");
-  if (mode === "sample") {
-    textStr = "\n" + textStr;
+    .map((text) => `${text.comment}${TAB}${text.key}: '${measureText(text.value, template)}',`)
+    .join('\n')
+  if (mode === 'sample') {
+    textStr = '\n' + textStr
   } else {
-    textStr = "export default {\n" + textStr + "\n}";
+    textStr = 'export default {\n' + textStr + '\n}'
   }
-  const write = mode === "sample" ? fs.appendFileSync : fs.writeFileSync;
+  const write = mode === 'sample' ? fs.appendFileSync : fs.writeFileSync
   // 判断文件夹是否存在并创建深层次文件夹
-  if (mode === "depth") {
-    const dirname = path.dirname(targetFilePath);
-    const exist = fs.existsSync(dirname);
+  if (mode === 'depth') {
+    const dirname = path.dirname(targetFilePath)
+    const exist = fs.existsSync(dirname)
     if (!exist) {
-      mkdirp.sync(dirname);
+      mkdirp.sync(dirname)
     }
   }
   try {
-    if (mode === "depth") {
-      textStr = prettier.format(textStr, { parser: "babel" });
+    if (mode === 'depth') {
+      textStr = prettier.format(textStr, { parser: 'babel' })
     }
-    write(targetFilePath, textStr);
+    write(targetFilePath, textStr)
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
 }
 
 function writeFileDepth(textArr: Text[], filename: string): void {
-  const { outputPath, rootPath } = <IConfig>global["intlConfig"];
-  const fileRelativePath = filename.replace(rootPath, "").substring(1);
-  const targetFilePath = path.resolve(outputPath, fileRelativePath);
-  writeFile(textArr, targetFilePath);
+  const { outputPath, rootPath } = <IConfig>global['intlConfig']
+  const fileRelativePath = filename.replace(rootPath, '').substring(1)
+  const targetFilePath = path.resolve(outputPath, fileRelativePath)
+  writeFile(textArr, targetFilePath)
 }
 
 interface IConfig {
-  outputPath: string;
-  rootPath: string;
-  template: boolean;
-  extractOnly: boolean;
-  whiteList: string[];
-  mode?: "sample" | "depth"; // 模式类型 简单模式/深层次导出
-  prefix?: string[];
+  outputPath: string
+  rootPath: string
+  template: boolean
+  extractOnly: boolean
+  whiteList: string[]
+  mode?: 'sample' | 'depth' // 模式类型 简单模式/深层次导出
+  prefix?: string[]
   // 用于处理模板字符串的配置
   templateString?: {
-    funcName: string;
-  };
+    funcName: string
+  }
 }
 
 function init(config: IConfig) {
-  const { outputPath, whiteList, mode, template } = config;
-  console.time("总计用时：");
-  if (is(whiteList, "array") && whiteList.length > 0) {
-    whiteListFileType = whiteList;
+  const { outputPath, whiteList, mode, template } = config
+  console.time('总计用时：')
+  if (is(whiteList, 'array') && whiteList.length > 0) {
+    whiteListFileType = whiteList
   }
-  delete config.whiteList;
+  delete config.whiteList
   // 生成模板时默认使用非替换模式
   if (template) {
-    config.extractOnly = true;
+    config.extractOnly = true
   }
-  global["intlConfig"] = config;
-  if (mode === "sample") {
+  global['intlConfig'] = config
+  if (mode === 'sample') {
     try {
-      fs.writeFileSync(outputPath, "export default {");
+      fs.writeFileSync(outputPath, 'export default {')
     } catch (error) {
-      console.log(`新建多语言文件${outputPath}失败！`);
+      console.log(`新建多语言文件${outputPath}失败！`)
     }
   } else {
     fs.mkdir(outputPath, (err) => {
-      if (err && err.code !== "EEXIST") {
-        console.log(`创建多语言目录${outputPath}失败！`);
+      if (err && err.code !== 'EEXIST') {
+        console.log(`创建多语言目录${outputPath}失败！`)
       }
-    });
+    })
   }
 }
 
@@ -105,36 +99,36 @@ function init(config: IConfig) {
  */
 function traverseDir(pathName: string, outputPath: string) {
   if (fs.statSync(pathName).isFile()) {
-    if (!whiteListFileType.includes(path.extname(pathName))) return;
-    const { mode } = <IConfig>global["intlConfig"];
-    const text = fs.readFileSync(pathName).toString(); // buffer to string
-    const result = transformChinese(text, pathName);
-    if (mode === "sample") {
-      writeFile(result, outputPath);
+    if (!whiteListFileType.includes(path.extname(pathName))) return
+    const { mode } = <IConfig>global['intlConfig']
+    const text = fs.readFileSync(pathName).toString() // buffer to string
+    const result = transformChinese(text, pathName)
+    if (mode === 'sample') {
+      writeFile(result, outputPath)
     } else {
-      writeFileDepth(result, pathName);
+      writeFileDepth(result, pathName)
     }
   } else {
     // 文件夹
-    const files = fs.readdirSync(pathName);
+    const files = fs.readdirSync(pathName)
     files.forEach((file) => {
-      const absPath = path.resolve(pathName, file);
-      traverseDir(absPath, outputPath);
-    });
+      const absPath = path.resolve(pathName, file)
+      traverseDir(absPath, outputPath)
+    })
   }
 }
 
 function formatFile(filePath: string) {
-  const rawData = fs.readFileSync(filePath, "utf8");
-  fs.writeFileSync(filePath, prettier.format(rawData, { parser: "babel" }));
+  const rawData = fs.readFileSync(filePath, 'utf8')
+  fs.writeFileSync(filePath, prettier.format(rawData, { parser: 'babel' }))
 }
 
 export function traverse(config: IConfig) {
-  init(config);
-  traverseDir(config.rootPath, config.outputPath);
-  if (config.mode === "sample") {
-    fs.appendFileSync(config.outputPath, "\n}");
-    formatFile(config.outputPath);
+  init(config)
+  traverseDir(config.rootPath, config.outputPath)
+  if (config.mode === 'sample') {
+    fs.appendFileSync(config.outputPath, '\n}')
+    formatFile(config.outputPath)
   }
-  console.timeEnd("总计用时：");
+  console.timeEnd('总计用时：')
 }
