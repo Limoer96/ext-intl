@@ -65,7 +65,7 @@ export function transformChinese(code: string, fileName: string) {
               matches.push({
                 key: name,
                 value: text.replace(/\$(?=\{)/g, ''), // 先行断言，去掉`$`
-                comment: `// ${text}\n`,
+                comment: `// ${text}`,
               })
               index += 1
               // 返回新的节点(函数调用)

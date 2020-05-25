@@ -20,7 +20,13 @@ function writeOutputFile(textArr: Text[], targetFilePath: string) {
     targetFilePath = path.resolve(outputPath, fileRelativePath)
   }
   let textStr = textArr
-    .map((text) => `${text.comment}${TAB}${text.key}: '${measureText(text.value, template)}',`)
+    .map(
+      (text) =>
+        `${text.comment.endsWith('\n') ? text.comment : `${text.comment}\n`}${text.key}: '${measureText(
+          text.value,
+          template
+        )}',`
+    )
     .join('\n')
   if (mode === 'sample') {
     textStr = '\n' + textStr
