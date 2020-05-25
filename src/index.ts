@@ -40,12 +40,14 @@ export function intl(config?: IConfig) {
     .then((config: IConfig) => {
       // 执行操作
       console.log('start running...')
+      console.time('complete with ms')
       const { rootPath, outputPath, mode } = config
       traverseDir(rootPath, outputPath)
       if (mode === 'sample') {
         fs.appendFileSync(outputPath, '\n}')
         formatFile(outputPath)
       }
+      console.timeEnd('complete with ms')
     })
     .catch((err) => {
       console.log(chalk.red('[Error]: ', err))
