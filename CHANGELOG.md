@@ -31,9 +31,9 @@
 - 基于[react-intl-universal](https://www.npmjs.com/package/react-intl-universal)关于包含*变量*词条(模板字符串)的写法方式，新增模板字符串原地替换，举例：
 
 ```js
-const message = `你好${visitor}，我是${name}`;
+const message = `你好${visitor}，我是${name}`
 // 将被替换成
-const message = intl.get(key, { visitor, name });
+const message = intl.get(key, { visitor, name })
 // 需要注意的是，`intl.get`将由配置`templateString.funcName`指定，可以根据项目不同选择封装适合的函数
 ```
 
@@ -43,3 +43,8 @@ const message = intl.get(key, { visitor, name });
 
 - 构建时生成对应的`.d.ts`文件，修复编译`ts`可能出错的问题
 - 使用`prettier`格式化生成代码
+
+### 1.6.0
+
+- 优化运行流程，简化配置
+- 修复生成词条格式化 bug
