@@ -65,6 +65,10 @@ export const INIT_CONFIG: IConfig = {
 
 > Tips: 也可以运行`yarn global add ext-intl`安装到全局，然后在根目录执行`extintl`即可，**不推荐这种方式！**
 
+#### 使用`vs code`插件（推荐）
+
+`ext-intl`已经支持`VS Code`插件，使用更简单方便。详情见[ext-intl(i18n Tool)](https://marketplace.visualstudio.com/items?itemName=limoer.ext-intl)
+
 ### API
 
 ```js
