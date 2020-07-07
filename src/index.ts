@@ -3,33 +3,31 @@ import checkConfig from './utils/checkConfig'
 import * as chalk from 'chalk'
 import { is, resolvePath } from './utils/common'
 import * as fs from 'fs'
-import { traverseDir, formatFile } from './traverse'
+import { traverseDir } from './traverse'
 
 export function intl(config?: IConfig) {
   checkConfig(config)
     .then((config: IConfig) => {
-      const { rootPath, outputPath, whiteList, mode, template } = config
+      const { rootPath, outputPath, whiteList, langs } = config
       // 处理文件白名单
       if (!is(whiteList, 'array') || whiteList.length === 0) {
         config.whiteList = INIT_CONFIG.whiteList
       }
-      // 生成模板时默认`extractOnly = true`
-      if (template) {
-        config.extractOnly = true
+      if (!langs || (is(langs, 'array') && langs.length === 0)) {
+        config.langs = INIT_CONFIG.langs
       }
-      const outDirOrFileName = resolvePath(outputPath)
+      const outDirName = resolvePath(outputPath)
       config.rootPath = resolvePath(rootPath)
-      config.outputPath = outDirOrFileName
+      config.outputPath = outDirName
       global['intlConfig'] = config
-      // 初始化输入目录/文件
-      if (mode === 'sample') {
-        try {
-          fs.writeFileSync(resolvePath(outDirOrFileName), 'export default {')
-        } catch (error) {
-          return Promise.reject(error)
+      // 初始化输入目录
+      fs.mkdir(outDirName, (err) => {
+        if (err && err.code !== 'EEXIST') {
+          return Promise.reject(err)
         }
-      } else {
-        fs.mkdir(outDirOrFileName, (err) => {
+      })
+      for (const lang of langs) {
+        fs.mkdir(`${outDirName}/${lang}`, (err) => {
           if (err && err.code !== 'EEXIST') {
             return Promise.reject(err)
           }
@@ -41,12 +39,8 @@ export function intl(config?: IConfig) {
       // 执行操作
       console.log('start running...')
       console.time('complete with ms')
-      const { rootPath, outputPath, mode } = config
-      traverseDir(rootPath, outputPath)
-      if (mode === 'sample') {
-        fs.appendFileSync(outputPath, '\n}')
-        formatFile(outputPath)
-      }
+      const { rootPath } = config
+      traverseDir(rootPath)
       console.timeEnd('complete with ms')
     })
     .catch((err) => {

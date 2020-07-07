@@ -127,3 +127,9 @@ export function getVariableFromTmeplateString(text: string): string[] {
 export function resolvePath(pathName) {
   return path.resolve(process.cwd(), pathName)
 }
+/**
+ * 检测是否是ts环境
+ */
+export function useTs(): boolean {
+  return fs.existsSync(resolvePath('.tsconfig.json'))
+}

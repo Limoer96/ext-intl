@@ -4,15 +4,15 @@ import { IConfig } from './constant'
 import { transformChinese } from './transformer/transformChinese'
 import * as prettier from 'prettier'
 import writeOutputFile from './utils/writeOutputFile'
+import writeDirExportEntry from './utils/writeDirExportEntry'
 
 /**
  *递归遍历文件并对中文进行抽取
  * @export
- * @param {string} pathName 遍历根路径
- * @param {string} outFilePath 输出路径
+ * @param {string} pathName 当前遍历路径
  */
-export function traverseDir(pathName: string, outputPath: string) {
-  const { mode, whiteList } = <IConfig>global['intlConfig']
+export function traverseDir(pathName: string) {
+  const { whiteList } = <IConfig>global['intlConfig']
   if (fs.statSync(pathName).isFile()) {
     // 单个文件
     if (!whiteList.includes(path.extname(pathName))) {
@@ -20,14 +20,16 @@ export function traverseDir(pathName: string, outputPath: string) {
     }
     const text = fs.readFileSync(pathName).toString()
     const result = transformChinese(text, pathName)
-    writeOutputFile(result, mode === 'sample' ? outputPath : pathName)
+    writeOutputFile(result, pathName)
   } else {
     // 文件夹
     const files = fs.readdirSync(pathName)
     files.forEach((file) => {
       const absPath = path.resolve(pathName, file)
-      traverseDir(absPath, outputPath)
+      traverseDir(absPath)
     })
+    // 针对文件夹写入入口文件
+    writeDirExportEntry(pathName)
   }
 }
 
