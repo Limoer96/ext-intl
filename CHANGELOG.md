@@ -48,3 +48,8 @@ const message = intl.get(key, { visitor, name })
 
 - 优化运行流程，简化配置
 - 修复生成词条格式化 bug
+
+### 2.0.0(2020/07/08)
+
+- 词条文件按目录结构生成并组织好可以导出
+- 集成`kiwi-intl`

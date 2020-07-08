@@ -1,52 +1,33 @@
 ## ext-intl
 
-> 基于`TypeScript AST APIs`，一个从 React 组件/js 源文件中提取和替换中文词条的工具
+> 基于`TypeScript AST APIs`，**零**配置国际化工具
 
 ### 功能
 
-1. 指定目录，提取所有中文词条(可指定扫描文件类型)
+1. 提取指定目录下的所有中文词条
 
-2. 词条自动命名，基于文件路径和计数
+2. 词条自动命名，基于文件路径和计数，支持词条原处替换(可选)
 
-3. 提取结果并输出到文件，如果有需要，可以生成词条模板方便进行国际化填充
+3. 按源目录结构生成词条文件
 
-4. 词条命名源文件替换(支持模板字符串)
+4. 集成[kiwi-intl](https://github.com/alibaba/kiwi/tree/master/kiwi-intl)
 
 ### 使用
 
+#### 基本使用
+
 1. `yarn add --dev ext-intl`
-2. 根目录新建`xx.js`文件：
+2. 新建`xx.js`，写入如下代码：
 
 ```js
 const { intl } = require('ext-intl')
-intl()
+const config = {...}
+intl(config)
 ```
 
-3. `node xx.js`
+3. 项目根目录下运行`node xx.js`
 
-如果没有指定任何配置，将会生成/使用默认配置`.extintl.json`，默认配置如下：
-
-```js
-export const INIT_CONFIG: IConfig = {
-  outputPath: resolvePath('./intl'), // 输出目录/文件名
-  rootPath: resolvePath('./src'), // 入口目录/文件名
-  template: false, // 是否生成可供填写的词条模板
-  extractOnly: true, // 是否只进行词条扫描
-  whiteList: ['.ts', '.tsx', '.js', '.jsx'], // 扫描文件白名单
-  mode: 'depth', // 输出词条保存模式
-  prefix: [], // 添加到源文件顶部的字符串，一般用于导入
-  // 处理模板字符串替换
-  templateString: {
-    funcName: 'intl.get', // 指定替换函数名
-  },
-}
-```
-
-> Tips: `intl(config?: Iconfig)`函数支持传入配置直接运行，也可以在根目录中新建`.extintl.json`自定义配置。
-
-> 特别注意，如需要词条模板，请先配置`{template: true, extractOnly: true}`生成，再进行后续词条生成；由于生成的模板和词条文件命名一致，请先保存。
-
-#### `CLI`调用方式
+#### CLI 使用方式（强烈推荐）
 
 1. `yarn add --dev ext-intl`
 2. 在`package.json`中，`scripts`中配置如下：
@@ -63,8 +44,6 @@ export const INIT_CONFIG: IConfig = {
 
 3. 运行`yarn intl`即可
 
-> Tips: 也可以运行`yarn global add ext-intl`安装到全局，然后在根目录执行`extintl`即可，**不推荐这种方式！**
-
 #### 使用`vs code`插件（推荐）
 
 `ext-intl`已经支持`VS Code`插件，使用更简单方便。详情见[ext-intl(i18n Tool)](https://marketplace.visualstudio.com/items?itemName=limoer.ext-intl)
@@ -79,12 +58,10 @@ export const INIT_CONFIG: IConfig = {
 function intl(config?: Iconfig){...}
 
 interface IConfig {
-  outputPath: string
+  outputPath: string // 已废弃，设置后不起作用，默认'resolvePath('./i18n')'
   rootPath: string
-  template: boolean
   extractOnly: boolean
   whiteList: string[]
-  mode?: "sample" | "depth" // 模式类型 简单模式/深层次导出
   prefix?: string[]
   // 用于处理模板字符串的配置
   templateString?: {
@@ -95,73 +72,122 @@ interface IConfig {
 
 ### 配置项
 
-| 参数                    | 说明                                                                                              | 类型             |
-| ----------------------- | ------------------------------------------------------------------------------------------------- | ---------------- |
-| outputPath              | 输出词条存储绝对路径，`mode`为`sample`时，指定为文件名，`depth`指定为目录                         | `string`         |
-| rootPath                | 源文件或源文件目录                                                                                | `string`         |
-| template                | 是否生成词条模板                                                                                  | `boolean`        |
-| extractOnly             | 是否只扫描文件，并不进行替换                                                                      | `boolean`        |
-| whiteList               | 文件类型白名单，指定只扫描文件类型，可过滤掉图片/字体等文件的干扰                                 | `string[]`       |
-| mode                    | 导出词条和模板文件的模式，`sample`模式下导出成为单一文件，`depth`模式下文件按照源文件目录结构导出 | `sample`/`depth` |
-| prefix                  | 在替换模式下，需要添加到源文件顶部的内容，一般为导出等                                            | `string[]`       |
-| templateString.funcName | 处理模板字符串时，用于原处替换的函数名称                                                          | `string`         |
+| 参数                               | 说明                                                              | 类型       |
+| ---------------------------------- | ----------------------------------------------------------------- | ---------- |
+| outputPath(已废弃，兼容原因未删除) |                                                                   | `string`   |
+| rootPath                           | 源文件或源文件目录                                                | `string`   |
+| extractOnly                        | 是否只扫描文件，并不进行替换                                      | `boolean`  |
+| whiteList                          | 文件类型白名单，指定只扫描文件类型，可过滤掉图片/字体等文件的干扰 | `string[]` |
+| prefix                             | 在替换模式下，需要添加到源文件顶部的内容，一般为导出等            | `string[]` |
+| templateString.funcName            | 处理模板字符串时，用于原处替换的函数名称                          | `string`   |
+
+参数默认值如下：
+
+```js
+export const DEFAULT_CONFIG: IConfig = {
+  outputPath: resolvePath('./i18n'),
+  rootPath: resolvePath('./src'),
+  langs: ['zh-CN', 'en-US'],
+  extractOnly: true,
+  whiteList: ['.ts', '.tsx', '.js', '.jsx'],
+  prefix: [],
+  templateString: {
+    funcName: 'kiwiIntl.get',
+  },
+}
+```
 
 ### 示例
+
+初始目录结构：
+
+![初始结构](https://ae01.alicdn.com/kf/H4e563770ffb245c7882cab09f3647a04K.jpg)
+
+运行流程：
+
+![运行流程](https://s1.ax1x.com/2020/07/08/UVylQO.gif)
+![运行结果](https://s1.ax1x.com/2020/07/08/UVyhlT.gif)
+
+完成后结构：
+
+![完成结构](https://s1.ax1x.com/2020/07/08/UV6tuF.png)
 
 源文件内容：
 
 ```js
-import * as React from 'react'
-const Comp = () => {
-  const name = '张san'
-  const name1 = 'li四'
-  const question = `你叫${name}对吗，我叫${name1}`
+import React from 'react'
+import logo from './logo.svg'
+import './App.css'
+
+function App() {
+  const name = '张珊'
+  const alias = 'limoer'
   return (
-    <div>
-      <p>你好！</p>
-      <p>{question}</p>
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>{欢迎页面}</p>
+        <p>{name}</p>
+        <p>{`你好${alias}，再见`}</p>
+      </header>
     </div>
   )
 }
-export default Comp
+
+export default App
 ```
 
 替换后的文件内容为：
 
 ```js
-import i18n from '@/i18n'
-import intl from '@/i18n/utils'
-import * as React from 'react'
-const Comp = () => {
-  const name = i18n.WwwExtintlDemoIndex1
-  const name1 = i18n.WwwExtintlDemoIndex2
-  const question = intl.get(i18n.WwwExtintlDemoIndex3, { name: name, name1: name1 })
+import kiwiIntl, { langMap } from './i18n'
+import React, { useState } from 'react'
+import logo from './logo.svg'
+import './App.css'
+function App() {
+  const name = kiwiIntl.App.App1
+  const alias = 'limoer'
+  // 以下切换多语言为手动添加
+  const [_, forceUpdate] = useState()
+  function handleChangeLang() {
+    kiwiIntl.setLang(langMap['en-US'])
+    forceUpdate({})
+  }
   return (
-    <div>
-      <p>{i18n.WwwExtintlDemoIndex4}</p>
-      <p>{question}</p>
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>{kiwiIntl.App.App2}</p>
+        <p>{name}</p>
+        <p>{kiwiIntl.get(kiwiIntl.App.App3, { alias: alias })}</p>
+        <button onClick={handleChangeLang}>english</button>
+      </header>
     </div>
   )
 }
-export default Comp
+export default App
 ```
 
 词条文件为：
 
 ```js
 export default {
-  /** 张san **/
-  WwwExtintlDemoIndex1: '张san',
-  /** li四 **/
-  WwwExtintlDemoIndex2: 'li四',
-  /**  `你叫${name}对吗，我叫${name1}` **/
-  WwwExtintlDemoIndex3: ' 你叫{name}对吗，我叫{name1}',
-  /** 你好;
-   **/
-  WwwExtintlDemoIndex4: '你好',
+  // 张珊
+  App1: '张珊',
+  // 欢迎页面;
+  App2: '欢迎页面',
+  // `你好${alias}，再见`
+  App3: '你好{alias}，再见',
 }
 ```
 
 ### ChangeLog
 
 [查看更新日志](./CHANGELOG.md)
+
+<style>
+  img {
+    max-width: 600px;
+    height: auto;
+  }
+</style>
