@@ -1,6 +1,16 @@
 import * as ts from 'typescript'
+import * as path from 'path'
 import { DOUBLE_BYTE_REGEX, IConfig } from '../constant'
-import { genKey, removeFileComment, saveFile, getVariableFromTmeplateString } from '../utils/common'
+import {
+  genKey,
+  removeFileComment,
+  saveFile,
+  getVariableFromTmeplateString,
+  getQuotePath,
+  resolvePath,
+  useTs,
+  geti18NString,
+} from '../utils/common'
 
 export interface Text {
   key: string
@@ -17,6 +27,7 @@ export function transformChinese(code: string, fileName: string) {
   const matches: Array<Text> = []
   const ast = ts.createSourceFile('', code, ts.ScriptTarget.ES2015, true, ts.ScriptKind.TSX)
   const key = genKey(fileName)
+  const quotePath = getQuotePath(fileName)
   let index = 1
   const transformer = <T extends ts.Node>(context: ts.TransformationContext) => (rootNode: T) => {
     function visit(node: ts.Node) {
@@ -34,7 +45,8 @@ export function transformChinese(code: string, fileName: string) {
             // 原处修改
             if (!extractOnly) {
               const parentNodeKind = node.parent.kind
-              const result = parentNodeKind === ts.SyntaxKind.JsxAttribute ? `{i18n.${name}}` : `i18n.${name}`
+              const result =
+                parentNodeKind === ts.SyntaxKind.JsxAttribute ? `{${quotePath}.${name}}` : `${quotePath}.${name}`
               return ts.createIdentifier(result)
             }
           }
@@ -51,7 +63,7 @@ export function transformChinese(code: string, fileName: string) {
             })
             index += 1
             if (!extractOnly) {
-              return ts.createJsxText(`{ i18n.${name} }`)
+              return ts.createJsxText(`{${quotePath}.${name}}`)
             }
           }
           break
@@ -74,7 +86,7 @@ export function transformChinese(code: string, fileName: string) {
                 variableList.map((variable) => ts.createPropertyAssignment(variable, ts.createIdentifier(variable)))
               )
               return ts.createCall(ts.createIdentifier(templateString.funcName), undefined, [
-                ts.createIdentifier(`i18n.${name}`),
+                ts.createIdentifier(`${quotePath}.${name}`),
                 objParam,
               ])
             } else {
@@ -89,8 +101,8 @@ export function transformChinese(code: string, fileName: string) {
     return ts.visitNode(rootNode, visit)
   }
   const transformedFile = ts.transform(ast, [transformer]).transformed[0]
-  if (!extractOnly) {
-    saveFile(transformedFile as any, fileName, prefix)
+  if (!extractOnly && matches.length > 0) {
+    saveFile(transformedFile as any, fileName, [geti18NString(fileName), ...prefix])
   }
   return matches
 }

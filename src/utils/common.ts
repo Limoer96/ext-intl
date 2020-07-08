@@ -29,17 +29,25 @@ function upperCase(str: string, idx: number) {
   }
 }
 
-// 依据文件路径生成key
-// 若路径中包含src，则只截取src后面的路径生成key，否则全路径生成key
-export function genKey(filePath: string) {
-  let { name, dir } = path.parse(filePath)
+export function parsePath(filePath: string) {
+  let { dir, name } = path.parse(filePath)
   const spliter = /[\/\\\\]/
   dir = dir.replace(/.*:/, '') // 去除windows下的盘符
   const paths: string[] = dir.split(spliter)
   const id = paths.indexOf('src')
   paths.splice(0, id + 1) //删除src以外所有路径
   paths.push(name)
+  return paths
+}
+
+export function genKey(filePath: string) {
+  const paths = parsePath(filePath)
   return paths.map((item, idx) => upperCase(item, idx).replace(/-/g, '')).join('')
+}
+// 获取引用路径
+export function getQuotePath(filePath: string) {
+  const paths = parsePath(filePath)
+  return `kiwiIntl.${paths.join('.')}`
 }
 
 export interface ReplacementItem {
@@ -132,4 +140,18 @@ export function resolvePath(pathName) {
  */
 export function useTs(): boolean {
   return fs.existsSync(resolvePath('.tsconfig.json'))
+}
+/**
+ * 获取当前页面导入intl的语句
+ * @param filePath
+ */
+export function geti18NString(filePath: string) {
+  const { dir } = path.parse(filePath)
+  const i18nEntryFilePath = resolvePath('./src/i18n')
+  let relativePath = path.relative(dir, i18nEntryFilePath).replace(/\\/g, '/')
+  if (relativePath.startsWith('i18n')) {
+    relativePath = './' + relativePath
+  }
+  const importI18NStr = `import kiwiIntl from '${relativePath}'`
+  return importI18NStr
 }

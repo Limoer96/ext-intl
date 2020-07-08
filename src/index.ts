@@ -4,6 +4,7 @@ import * as chalk from 'chalk'
 import { is, resolvePath } from './utils/common'
 import * as fs from 'fs'
 import { traverseDir } from './traverse'
+import writeTemplateFile from './intl/i18nTemplate'
 
 export function intl(config?: IConfig) {
   checkConfig(config)
@@ -16,7 +17,8 @@ export function intl(config?: IConfig) {
       if (!langs || (is(langs, 'array') && langs.length === 0)) {
         config.langs = INIT_CONFIG.langs
       }
-      const outDirName = resolvePath(outputPath)
+      // 输出路径使用默认值
+      const outDirName = INIT_CONFIG.outputPath
       config.rootPath = resolvePath(rootPath)
       config.outputPath = outDirName
       global['intlConfig'] = config
@@ -41,10 +43,11 @@ export function intl(config?: IConfig) {
       console.time('complete with ms')
       const { rootPath } = config
       traverseDir(rootPath)
+      writeTemplateFile(config.langs)
       console.timeEnd('complete with ms')
     })
-    .catch((err) => {
-      console.log(chalk.red('[Error]: ', err))
-      process.exit(1)
-    })
+  // .catch((err) => {
+  //   console.log(chalk.red('[Error]: ', err))
+  //   process.exit(1)
+  // })
 }

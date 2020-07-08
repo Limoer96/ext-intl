@@ -20,11 +20,17 @@ function writeDirExportEntry(dirPath: string) {
     let filePath = dirPath
     const fileRelativePath = filePath.replace(rootPath, '').substring(1)
     filePath = path.resolve(path.resolve(outputPath, lang), fileRelativePath)
+    if (!fs.existsSync(filePath)) {
+      return
+    }
     const fileOrDirs = fs.readdirSync(filePath)
     // 生成写入内容
     const fileBaseNames = []
     let content = ''
     for (let f of fileOrDirs) {
+      if (f === `_index${extname}`) {
+        continue
+      }
       const absPath = path.resolve(dirPath, f)
       const stats = fs.statSync(absPath)
       // 如果是文件夹的话，则从`dirName/_index`中导入

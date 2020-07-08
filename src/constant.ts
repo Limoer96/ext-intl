@@ -24,7 +24,7 @@ export const INIT_CONFIG: IConfig = {
   whiteList: ['.ts', '.tsx', '.js', '.jsx'],
   prefix: [],
   templateString: {
-    funcName: 'intl.get',
+    funcName: 'kiwiIntl.get',
   },
 }
 
