@@ -155,3 +155,10 @@ export function geti18NString(filePath: string) {
   const importI18NStr = `import kiwiIntl from '${relativePath}'`
   return importI18NStr
 }
+
+/**
+ * 获取输出路径(兼容vscode插件)
+ */
+export function getOutputPath() {
+  return resolvePath('./i18n')
+}
