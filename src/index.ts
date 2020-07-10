@@ -1,6 +1,5 @@
 import { IConfig, INIT_CONFIG } from './constant'
 import checkConfig from './utils/checkConfig'
-import * as chalk from 'chalk'
 import { is, resolvePath, getOutputPath } from './utils/common'
 import * as fs from 'fs'
 import { traverseDir } from './traverse'
