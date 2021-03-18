@@ -39,7 +39,10 @@ export function transformChinese(code: string, fileName: string) {
             matches.push({
               key: name,
               value: text,
-              comment: `// ${text}`,
+              comment: `
+                /**
+                 * ${text} 
+                 */`,
             })
             index += 1
             // 原处修改
@@ -56,10 +59,14 @@ export function transformChinese(code: string, fileName: string) {
           const text = node.getText()
           let noCommentText = removeFileComment(text, fileName)
           if (noCommentText.match(DOUBLE_BYTE_REGEX)) {
+            noCommentText.replace(';\n', '')
             matches.push({
               key: name,
               value: noCommentText,
-              comment: `// ${noCommentText}`,
+              comment: `
+              /**
+               * ${noCommentText} 
+               */`,
             })
             index += 1
             if (!extractOnly) {
@@ -77,7 +84,10 @@ export function transformChinese(code: string, fileName: string) {
               matches.push({
                 key: name,
                 value: text.replace(/\$(?=\{)/g, ''), // 先行断言，去掉`$`
-                comment: `// ${text}`,
+                comment: `
+                /**
+                 * ${text} 
+                 */`,
               })
               index += 1
               // 返回新的节点(函数调用)

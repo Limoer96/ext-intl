@@ -5,7 +5,7 @@ import * as mkdirp from 'mkdirp'
 import * as prettier from 'prettier'
 import { Text } from '../transformer/transformChinese'
 import { IConfig, DEFAULT_LANGUAGE } from '../constant'
-import { measureText } from './common'
+import { measureText, useTs } from './common'
 
 /**
  * 将提取结果写入到文件
@@ -23,7 +23,9 @@ function writeOutputFile(textArr: Text[], targetFilePath: string, lang: string) 
     )
     .join('\n')
   textStr = 'export default {\n' + textStr + '\n}'
-  textStr = prettier.format(textStr, { parser: 'babel' })
+  try {
+    textStr = prettier.format(textStr, { parser: 'babel', singleQuote: true })
+  } catch (error) {}
   const write = fs.writeFileSync
   // 判断文件夹是否存在并创建深层次文件夹
   const dirname = path.dirname(targetFilePath)
@@ -31,8 +33,10 @@ function writeOutputFile(textArr: Text[], targetFilePath: string, lang: string) 
   if (!exist) {
     mkdirp.sync(dirname)
   }
+  const extName = useTs ? '.ts' : '.js'
+  const fileName = targetFilePath.replace(path.parse(targetFilePath).ext, extName)
   try {
-    write(targetFilePath, textStr)
+    write(fileName, textStr)
   } catch (error) {
     console.log(chalk.red(error))
   }

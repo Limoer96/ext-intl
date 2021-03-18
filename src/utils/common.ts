@@ -139,7 +139,7 @@ export function resolvePath(pathName) {
  * 检测是否是ts环境
  */
 export function useTs(): boolean {
-  return fs.existsSync(resolvePath('.tsconfig.json'))
+  return fs.existsSync(resolvePath('tsconfig.json'))
 }
 /**
  * 获取当前页面导入intl的语句
@@ -161,4 +161,20 @@ export function geti18NString(filePath: string) {
  */
 export function getOutputPath() {
   return resolvePath('./i18n')
+}
+
+/**
+ * formatFileName
+ */
+
+export function formatFileName(fnameStr: string) {
+  const fileNameArr = fnameStr.split('-')
+  return fileNameArr
+    .map((name, index) => {
+      if (index === 0) {
+        return name
+      }
+      return name.substring(0, 1).toUpperCase() + name.substring(1)
+    })
+    .join('')
 }
