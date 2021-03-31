@@ -53,3 +53,9 @@ const message = intl.get(key, { visitor, name })
 
 - 词条文件按目录结构生成并组织好可以导出
 - 集成`kiwi-intl`
+
+### 2.0.3(2021/03/31)
+
+- 修复了因为文件名中包含'-'时报错的问题
+- 修复了`js`和`ts`环境检测异常的问题
+- 统一了提示格式，修复了`unhandledRejection`异常
