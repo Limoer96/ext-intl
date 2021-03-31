@@ -7,7 +7,7 @@ import writeOutputFile from './utils/writeOutputFile'
 import writeDirExportEntry from './utils/writeDirExportEntry'
 
 /**
- *递归遍历文件并对中文进行抽取
+ * 递归遍历文件并对中文进行抽取
  * @export
  * @param {string} pathName 当前遍历路径
  */

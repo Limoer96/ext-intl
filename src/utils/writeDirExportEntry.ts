@@ -55,7 +55,7 @@ function writeDirExportEntry(dirPath: string) {
     try {
       fs.writeFileSync(entryPath, content)
     } catch (error) {
-      console.log(chalk.red(error))
+      console.log(chalk.red(`[ERROR] ${error}`))
     }
   }
 }

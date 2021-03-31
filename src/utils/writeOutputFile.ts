@@ -38,7 +38,7 @@ function writeOutputFile(textArr: Text[], targetFilePath: string, lang: string) 
   try {
     write(fileName, textStr)
   } catch (error) {
-    console.log(chalk.red(error))
+    console.log(chalk.red(`[ERROR] ${error}`))
   }
 }
 

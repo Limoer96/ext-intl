@@ -14,7 +14,7 @@ function checkNoNullConfig(config: IConfig) {
   if (!config || isAndEmpty(config, 'object', (value) => Object.keys(value).length === 0)) {
     return null
   }
-  console.log(`warning: ${chalk.yellow('Unconfigured items will use the default configuration')}`)
+  console.log(`[WARNING] ${chalk.yellow('Unconfigured items will use the default configuration')}`)
   return {
     ...INIT_CONFIG,
     ...config,
@@ -37,7 +37,7 @@ function checkConfig(config: IConfig) {
             type: 'confirm',
             name: 'addDefaultConfig',
             message:
-              chalk.yellow('Could not find configuration file.') +
+              chalk.yellow('[WARNING] Could not find configuration file.') +
               '\n\n' +
               'would you want to add default at: ' +
               chalk.bold(CONFIG_FILE_NAME),
@@ -47,7 +47,7 @@ function checkConfig(config: IConfig) {
             if (!answer.addDefaultConfig) {
               console.log(
                 chalk.red(
-                  'The operation of the tool requires related configuration. Please configure the necessary configuration before continuing.'
+                  '[WARNING] The operation of the tool requires related configuration. Please configure the necessary configuration before continuing.'
                 )
               )
               process.exit(1)
@@ -56,6 +56,7 @@ function checkConfig(config: IConfig) {
               resolvePath(CONFIG_FILE_NAME),
               prettier.format(JSON.stringify(INIT_CONFIG), { parser: 'json' })
             )
+            console.log(chalk.green('[INFO] run with initial configuration...'))
             resolve(INIT_CONFIG)
           })
         } else {

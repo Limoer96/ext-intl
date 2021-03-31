@@ -4,6 +4,7 @@ import { is, resolvePath, getOutputPath } from './utils/common'
 import * as fs from 'fs'
 import { traverseDir } from './traverse'
 import writeTemplateFile from './intl/i18nTemplate'
+import chalk = require('chalk')
 
 export function intl(config?: IConfig) {
   checkConfig(config)
@@ -27,26 +28,36 @@ export function intl(config?: IConfig) {
           return Promise.reject(err)
         }
       })
-      for (const lang of langs) {
-        fs.mkdir(`${outDirName}/${lang}`, (err) => {
-          if (err && err.code !== 'EEXIST') {
-            return Promise.reject(err)
-          }
-        })
+      try {
+        fs.mkdirSync(outDirName)
+        for (const lang of langs) {
+          fs.mkdirSync(`${outDirName}/${lang}`)
+        }
+      } catch (error) {
+        const code = error.code
+        if (code && code !== 'EEXIST') {
+          return Promise.reject(error)
+        }
       }
       return config
     })
     .then((config: IConfig) => {
       // 执行操作
-      console.log('start running...')
-      console.time('complete with ms')
+      console.log('[INFO] start running...')
+      console.time('[INFO] complete with ms')
       const { rootPath } = config
       traverseDir(rootPath)
-      writeTemplateFile(config.langs)
-      console.timeEnd('complete with ms')
+      if (!config.extractOnly) {
+        writeTemplateFile(config.langs)
+      }
+      console.timeEnd('[INFO] complete with ms')
     })
-  // .catch((err) => {
-  //   console.log(chalk.red('[Error]: ', err))
-  //   process.exit(1)
-  // })
+    .catch((err) => {
+      console.log(chalk.red('[Error]: ', err))
+      process.exit(1)
+    })
 }
+
+// process.on('unhandledRejection', (reason) => {
+//   console.log(chalk.yellow(`[WARNING] ${reason}`))
+// })

@@ -33,12 +33,12 @@ function writeTemplateFile(langs: string[]) {
   }
   let filePath = getFilePath('i18n')
   if (fs.existsSync(filePath)) {
-    chalk.yellow("[WARNING] The'i18n' file already exists, Content will be overwritten.")
+    console.log(chalk.yellow("[WARNING] The'i18n' file already exists, Content will be overwritten."))
   }
   try {
     fs.writeFileSync(filePath, contentString)
   } catch (error) {
-    chalk.red(`[ERROR] Error happended with message: ${error.message}`)
+    console.log(chalk.red(`[ERROR] Error happended with message: ${error.message}`))
   }
 }
 

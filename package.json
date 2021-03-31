@@ -23,7 +23,7 @@
     "chalk": "^4.0.0",
     "inquirer": "^7.1.0",
     "kiwi-intl": "^1.2.4",
-    "mkdirp": "^0.5.1",
+    "mkdirp": "^1.0.4",
     "prettier": "^2.0.5",
     "typescript": "^3.9.3"
   },
