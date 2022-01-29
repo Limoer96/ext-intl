@@ -14,6 +14,10 @@ export interface IConfig {
     funcName: string
   }
   langs?: string[]
+  /**
+   * 命名时字段前缀
+   */
+  fieldPrefix?: string
 }
 
 export const INIT_CONFIG: IConfig = {
@@ -26,6 +30,7 @@ export const INIT_CONFIG: IConfig = {
   templateString: {
     funcName: 'kiwiIntl.get',
   },
+  fieldPrefix: 'intl',
 }
 
 export const CONFIG_FILE_NAME = '.extintl.json'
