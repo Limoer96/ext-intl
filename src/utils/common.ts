@@ -89,7 +89,11 @@ export function saveFile(ast: ts.SourceFile, fileName: string, prefix?: string[]
   if (prefix) {
     file = prefix.join('\n') + '\n' + file
   }
-  fs.writeFileSync(fileName, formatFileWithConfig(file))
+  try {
+    fs.writeFileSync(fileName, formatFileWithConfig(file))
+  } catch (error) {
+    console.log(chalk.red(`[ERROR] failed to generate file: ${fileName}`))
+  }
 }
 
 /**
