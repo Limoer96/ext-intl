@@ -52,7 +52,11 @@ function writeMultiOutFile(textArr: Text[], targetFilePath: string) {
   if (textArr.length === 0) return
   for (const lang of langs) {
     let filePath = targetFilePath
-    const fileRelativePath = filePath.replace(rootPath, '').substring(1)
+    let fileRelativePath = filePath.replace(rootPath, '').substring(1)
+    // fix: 确保是一个相对路径
+    if (fileRelativePath.startsWith('/')) {
+      fileRelativePath = fileRelativePath.slice(1)
+    }
     filePath = path.resolve(path.resolve(outputPath, versionName, lang), fileRelativePath)
     writeOutputFile(textArr, filePath, lang)
   }

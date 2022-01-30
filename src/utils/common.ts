@@ -31,13 +31,11 @@ function upperCase(str: string, idx: number) {
   }
 }
 
-export function parsePath(filePath: string) {
-  let { dir, name } = path.parse(filePath)
+export function parsePath(fileRelativePath: string) {
+  const { dir, name } = path.parse(fileRelativePath)
+  const paths = []
   const spliter = /[\/\\\\]/
-  dir = dir.replace(/.*:/, '') // 去除windows下的盘符
-  const paths: string[] = dir.split(spliter)
-  const id = paths.indexOf('src')
-  paths.splice(0, id + 1) //删除src以外所有路径
+  paths.push(...dir.split(spliter).filter(Boolean))
   paths.push(name)
   return paths
 }
@@ -47,9 +45,9 @@ export function genKey(filePath: string) {
   return paths.map((item, idx) => upperCase(item, idx).replace(/-/g, '')).join('')
 }
 // 获取引用路径
-// 例如 {kiwiIntl.pages.auth.lang_selection.index.intl_1}
-export function getQuotePath(filePath: string, versionName: string) {
-  const paths = parsePath(filePath).map((item) => formatFileName(item)) // 把短横线换成下划线
+export function getQuotePath(rootPath: string, filePath: string, versionName: string) {
+  const relativePath = filePath.replace(rootPath, '')
+  const paths = parsePath(relativePath).map((item) => formatFileName(item)) // 把短横线换成下划线
   return `kiwiIntl.${versionName}.${paths.join('.')}`
 }
 
