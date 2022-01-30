@@ -1,10 +1,9 @@
 import { IConfig, INIT_CONFIG, CONFIG_FILE_NAME } from '../constant'
-import { is } from '../utils/common'
+import { formatFileWithConfig, is } from '../utils/common'
 import * as fs from 'fs'
 import { resolvePath } from './common'
 import * as chalk from 'chalk'
 import * as inquirer from 'inquirer'
-import * as prettier from 'prettier'
 
 function isAndEmpty(value: any, type: string, check: (value: any) => boolean) {
   return is(value, type) && check(value)
@@ -52,10 +51,7 @@ function checkConfig(config: IConfig) {
               )
               process.exit(1)
             }
-            fs.writeFileSync(
-              resolvePath(CONFIG_FILE_NAME),
-              prettier.format(JSON.stringify(INIT_CONFIG), { parser: 'json' })
-            )
+            fs.writeFileSync(resolvePath(CONFIG_FILE_NAME), formatFileWithConfig(JSON.stringify(INIT_CONFIG)))
             console.log(chalk.green('[INFO] run with initial configuration...'))
             resolve(INIT_CONFIG)
           })

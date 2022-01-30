@@ -18,10 +18,10 @@ export interface Text {
  * @param fileName 当前文件路径名
  */
 export function transformChinese(code: string, fileName: string) {
-  const { extractOnly, prefix, templateString, fieldPrefix } = <IConfig>global['intlConfig']
+  const { extractOnly, prefix, templateString, fieldPrefix, versionName } = <IConfig>global['intlConfig']
   const matches: Array<Text> = []
   const ast = ts.createSourceFile('', code, ts.ScriptTarget.ES2015, true, ts.ScriptKind.TSX)
-  const quotePath = getQuotePath(fileName)
+  const quotePath = getQuotePath(fileName, versionName)
   let index = 1
   const transformer = <T extends ts.Node>(context: ts.TransformationContext) => (rootNode: T) => {
     function visit(node: ts.Node) {

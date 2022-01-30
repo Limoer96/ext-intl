@@ -2,10 +2,9 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as chalk from 'chalk'
 import * as mkdirp from 'mkdirp'
-import * as prettier from 'prettier'
 import { Text } from '../transformer/transformChinese'
 import { IConfig, DEFAULT_LANGUAGE } from '../constant'
-import { measureText, useTs } from './common'
+import { formatFileWithConfig, measureText, useTs } from './common'
 
 /**
  * 将提取结果写入到文件
@@ -24,7 +23,7 @@ function writeOutputFile(textArr: Text[], targetFilePath: string, lang: string) 
     .join('\n')
   textStr = 'export default {\n' + textStr + '\n}'
   try {
-    textStr = prettier.format(textStr, { parser: 'babel', singleQuote: true })
+    textStr = formatFileWithConfig(textStr)
   } catch (error) {}
   const write = fs.writeFileSync
   // 判断文件夹是否存在并创建深层次文件夹
@@ -49,12 +48,12 @@ function writeOutputFile(textArr: Text[], targetFilePath: string, lang: string) 
  */
 
 function writeMultiOutFile(textArr: Text[], targetFilePath: string) {
-  const { langs, outputPath, rootPath } = <IConfig>global['intlConfig']
+  const { langs, outputPath, rootPath, versionName } = <IConfig>global['intlConfig']
   if (textArr.length === 0) return
   for (const lang of langs) {
     let filePath = targetFilePath
     const fileRelativePath = filePath.replace(rootPath, '').substring(1)
-    filePath = path.resolve(path.resolve(outputPath, lang), fileRelativePath)
+    filePath = path.resolve(path.resolve(outputPath, versionName, lang), fileRelativePath)
     writeOutputFile(textArr, filePath, lang)
   }
 }

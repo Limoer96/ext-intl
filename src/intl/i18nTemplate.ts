@@ -1,15 +1,14 @@
-import * as prettier from 'prettier'
 import * as fs from 'fs'
 import * as chalk from 'chalk'
-import { useTs, resolvePath } from '../utils/common'
+import { useTs, resolvePath, formatFileWithConfig } from '../utils/common'
 
 function getTemplateString(langs: string[]) {
   const langMapStringList = ['const langs = {\n']
   const langNameMapStringList = ['export const langMap = {\n']
   const importLines = ["import kiwiIntl from 'kiwi-intl';\n"]
+  importLines.push(`import { ${langs.map((lang) => lang.replace('-', '')).join(',')} } from '../i18n';\n`)
   for (const lang of langs) {
     const langName = lang.replace('-', '')
-    importLines.push(`import ${langName} from '../i18n/${lang}/_index';\n`)
     langNameMapStringList.push(`'${lang}': '${lang}',\n`)
     langMapStringList.push(`'${lang}': ${langName},\n`)
   }
@@ -23,7 +22,7 @@ function getTemplateString(langs: string[]) {
     const I18N = kiwiIntl.init(currentLang, langs)
     export default I18N
   `
-  return prettier.format(returnd, { parser: 'babel' })
+  return formatFileWithConfig(returnd)
 }
 
 function writeTemplateFile(langs: string[]) {

@@ -2,9 +2,9 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { IConfig } from './constant'
 import { transformChinese } from './transformer/transformChinese'
-import * as prettier from 'prettier'
 import writeOutputFile from './utils/writeOutputFile'
 import writeDirExportEntry from './utils/writeDirExportEntry'
+import { formatFileWithConfig } from './utils/common'
 
 /**
  * 递归遍历文件并对中文进行抽取
@@ -39,5 +39,5 @@ export function traverseDir(pathName: string) {
  */
 export function formatFile(filePath: string) {
   const rawData = fs.readFileSync(filePath, 'utf8')
-  fs.writeFileSync(filePath, prettier.format(rawData, { parser: 'babel' }))
+  fs.writeFileSync(filePath, formatFileWithConfig(rawData))
 }

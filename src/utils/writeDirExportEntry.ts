@@ -2,9 +2,8 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as chalk from 'chalk'
 import * as mkdirp from 'mkdirp'
-import * as prettier from 'prettier'
 import { IConfig } from '../constant'
-import { formatFileName, useTs } from './common'
+import { formatFileName, formatFileWithConfig, useTs } from './common'
 
 /**
  * 给每个文件夹写入一个导出入口`index.js/ts`
@@ -13,13 +12,13 @@ import { formatFileName, useTs } from './common'
  */
 
 function writeDirExportEntry(dirPath: string) {
-  const { whiteList, rootPath, outputPath, langs } = <IConfig>global['intlConfig']
+  const { whiteList, rootPath, outputPath, langs, versionName } = <IConfig>global['intlConfig']
   const extname = '.' + (useTs() ? 'ts' : 'js')
   // 处理文件路径
   for (const lang of langs) {
     let filePath = dirPath
     const fileRelativePath = filePath.replace(rootPath, '').substring(1)
-    filePath = path.resolve(path.resolve(outputPath, lang), fileRelativePath)
+    filePath = path.resolve(path.resolve(outputPath, versionName, lang), fileRelativePath)
     if (!fs.existsSync(filePath)) {
       return
     }
@@ -45,7 +44,7 @@ function writeDirExportEntry(dirPath: string) {
       }
     }
     content += `export default { ${fileBaseNames.join(',')} }`
-    content = prettier.format(content, { parser: 'babel', singleQuote: true })
+    content = formatFileWithConfig(content)
     // 写入到文件
     const entryPath = path.resolve(filePath, `_index${extname}`)
     const exist = fs.existsSync(filePath)

@@ -18,6 +18,10 @@ export interface IConfig {
    * 命名时字段前缀
    */
   fieldPrefix?: string
+  /**
+   * 某次运行时的版本（不需要传入），如果`extractOnly`为true，则versionName=''表示不使用版本规则
+   */
+  versionName?: string
 }
 
 export const INIT_CONFIG: IConfig = {

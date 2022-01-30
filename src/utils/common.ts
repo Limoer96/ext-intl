@@ -1,6 +1,8 @@
 import * as ts from 'typescript'
 import * as path from 'path'
 import * as fs from 'fs'
+import * as chalk from 'chalk'
+import * as prettier from 'prettier'
 /**
  * 去掉文件中的注释
  * @param code
@@ -45,9 +47,10 @@ export function genKey(filePath: string) {
   return paths.map((item, idx) => upperCase(item, idx).replace(/-/g, '')).join('')
 }
 // 获取引用路径
-export function getQuotePath(filePath: string) {
-  const paths = parsePath(filePath)
-  return `kiwiIntl.${paths.join('.')}`
+// 例如 {kiwiIntl.pages.auth.lang_selection.index.intl_1}
+export function getQuotePath(filePath: string, versionName: string) {
+  const paths = parsePath(filePath).map((item) => formatFileName(item)) // 把短横线换成下划线
+  return `kiwiIntl.${versionName}.${paths.join('.')}`
 }
 
 export interface ReplacementItem {
@@ -166,7 +169,6 @@ export function getOutputPath() {
 /**
  * formatFileName
  */
-
 export function formatFileName(fnameStr: string) {
   const fileNameArr = fnameStr.split('-')
   return fileNameArr
@@ -177,4 +179,68 @@ export function formatFileName(fnameStr: string) {
       return name.substring(0, 1).toUpperCase() + name.substring(1)
     })
     .join('')
+}
+
+const INIT_VERSION_NUMBER = 1
+/**
+ * 获取当次版本号
+ * @returns
+ */
+export function getVersionName() {
+  const outputPath = getOutputPath()
+  // 首次生成
+  if (!fs.existsSync(outputPath)) {
+    return `v${INIT_VERSION_NUMBER}`
+  }
+  // 获取新的版本号
+  const childPathList = fs.readdirSync(outputPath)
+  const versionExist = []
+  for (const childPath of childPathList) {
+    const childPathAbsolute = `${outputPath}/${childPath}`
+    if (fs.statSync(childPathAbsolute).isDirectory()) {
+      const relativePath = path.relative(outputPath, childPathAbsolute)
+      if (relativePath.startsWith('v')) {
+        versionExist.push(Number(relativePath.replace('v', '')))
+      }
+    }
+  }
+  const versionSorted = versionExist.filter(Boolean).sort((a, b) => a - b)
+  const lastVerion = versionSorted.pop()
+  return `v${lastVerion + 1 || INIT_VERSION_NUMBER}`
+}
+
+/**
+ * 使用项目中的prettier配置进行格式化
+ * @param text 需要格式化的文本
+ * @param configFilePath 配置开始搜索的目录
+ * @returns 格式化后的文本
+ */
+export function formatFileWithConfig(text: string, configFilePath?: string) {
+  if (!configFilePath) {
+    configFilePath = process.cwd()
+  }
+  let options: prettier.Options = {
+    parser: 'typescript',
+    bracketSpacing: true,
+    jsxBracketSameLine: true,
+    singleQuote: true,
+    trailingComma: 'all',
+    arrowParens: 'avoid',
+    semi: false,
+    useTabs: true,
+  }
+  try {
+    const configFinded = prettier.resolveConfig.sync(configFilePath)
+    if (configFinded) {
+      options = {
+        ...configFinded,
+        parser: 'typescript',
+      }
+    }
+  } catch (error) {
+    console.log(
+      chalk.yellow('[WARNING] can not find perttier config file in your project, use default config instead!')
+    )
+  }
+  return prettier.format(text, options)
 }
