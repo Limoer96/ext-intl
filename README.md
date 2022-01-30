@@ -6,15 +6,15 @@
 
 1. 提取指定目录下的所有中文词条
 
-2. 词条自动命名，基于文件路径和计数，支持词条原处替换(可选)
+2. 词条自动命名，基于自定义命名前缀和计数，支持词条原处替换(可选)
 
-3. 按源目录结构生成词条文件
+3. 按源目录结构生成多语言词条文件
 
-4. 集成[kiwi-intl](https://github.com/alibaba/kiwi/tree/master/kiwi-intl)
+4. 集成[kiwi-intl](https://github.com/alibaba/kiwi/tree/master/kiwi-intl)（可选）
 
 ### 使用
 
-#### 基本使用
+#### API 调用
 
 1. `yarn add --dev ext-intl`
 2. 新建`xx.js`，写入如下代码：
@@ -46,6 +46,8 @@ intl(config)
 
 #### 使用`vs code`插件（推荐）
 
+> 该插件暂时无法使用
+
 `ext-intl`已经支持`VS Code`插件，使用更简单方便。详情见[ext-intl(i18n Tool)](https://marketplace.visualstudio.com/items?itemName=limoer.ext-intl)
 
 ### API
@@ -67,19 +69,29 @@ interface IConfig {
   templateString?: {
     funcName: string
   }
+  /**
+   * 命名时字段前缀默认为`intl`
+   */
+  fieldPrefix?: string
+  /**
+   * 某次运行时的版本（请不要手动传入）
+   */
+  versionName?: string
 }
 ```
 
 ### 配置项
 
-| 参数                               | 说明                                                              | 类型       |
-| ---------------------------------- | ----------------------------------------------------------------- | ---------- |
-| outputPath(已废弃，兼容原因未删除) |                                                                   | `string`   |
-| rootPath                           | 源文件或源文件目录                                                | `string`   |
-| extractOnly                        | 是否只扫描文件，并不进行替换                                      | `boolean`  |
-| whiteList                          | 文件类型白名单，指定只扫描文件类型，可过滤掉图片/字体等文件的干扰 | `string[]` |
-| prefix                             | 在替换模式下，需要添加到源文件顶部的内容，一般为导出等            | `string[]` |
-| templateString.funcName            | 处理模板字符串时，用于原处替换的函数名称                          | `string`   |
+| 参数                               | 说明                                                                                | 类型       |
+| ---------------------------------- | ----------------------------------------------------------------------------------- | ---------- |
+| outputPath(已废弃，兼容原因未删除) |                                                                                     | `string`   |
+| rootPath                           | 源文件或源文件目录                                                                  | `string`   |
+| extractOnly                        | 是否只扫描文件，并不进行替换                                                        | `boolean`  |
+| whiteList                          | 文件类型白名单，指定只扫描文件类型，可过滤掉图片/字体等文件的干扰                   | `string[]` |
+| prefix                             | 在替换模式下，需要添加到源文件顶部的内容，一般为导出等                              | `string[]` |
+| templateString.funcName            | 处理模板字符串时，用于原处替换的函数名称                                            | `string`   |
+| fieldPrefix                        | 生成字段命名时，使用的前前缀字符串，字段命名规则为{prefix}\_{index}，默认值：`intl` | `string`   |
+| versionName                        | 当次运行的版本，内部自动维护，请不要手动传入，命名规则 v{index}｜`string`           |
 
 参数默认值如下：
 
@@ -94,6 +106,7 @@ export const DEFAULT_CONFIG: IConfig = {
   templateString: {
     funcName: 'kiwiIntl.get',
   },
+  fieldPrefix: 'intl',
 }
 ```
 
@@ -145,7 +158,7 @@ import React, { useState } from 'react'
 import logo from './logo.svg'
 import './App.css'
 function App() {
-  const name = kiwiIntl.App.App1
+  const name = kiwiIntl.v1.App.intl_1
   const alias = 'limoer'
   // 以下切换多语言为手动添加
   const [_, forceUpdate] = useState()
@@ -157,9 +170,9 @@ function App() {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>{kiwiIntl.App.App2}</p>
+        <p>{kiwiIntl.v1.App.intl2}</p>
         <p>{name}</p>
-        <p>{kiwiIntl.get(kiwiIntl.App.App3, { alias: alias })}</p>
+        <p>{kiwiIntl.get(kiwiIntl.v1.App.intl3, { alias: alias })}</p>
         <button onClick={handleChangeLang}>english</button>
       </header>
     </div>

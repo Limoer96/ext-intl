@@ -89,7 +89,7 @@ export function saveFile(ast: ts.SourceFile, fileName: string, prefix?: string[]
   if (prefix) {
     file = prefix.join('\n') + '\n' + file
   }
-  fs.writeFileSync(fileName, file)
+  fs.writeFileSync(fileName, formatFileWithConfig(file))
 }
 
 /**
