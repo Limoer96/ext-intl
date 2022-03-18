@@ -12,6 +12,8 @@
 
 4. 集成[kiwi-intl](https://github.com/alibaba/kiwi/tree/master/kiwi-intl)（可选）
 
+5. 可多次运行，增量提取（需要 v2.1.0 及以上版本）
+
 ### 使用
 
 #### API 调用
@@ -82,16 +84,16 @@ interface IConfig {
 
 ### 配置项
 
-| 参数                               | 说明                                                                                | 类型       |
-| ---------------------------------- | ----------------------------------------------------------------------------------- | ---------- |
-| outputPath(已废弃，兼容原因未删除) |                                                                                     | `string`   |
-| rootPath                           | 源文件或源文件目录                                                                  | `string`   |
-| extractOnly                        | 是否只扫描文件，并不进行替换                                                        | `boolean`  |
-| whiteList                          | 文件类型白名单，指定只扫描文件类型，可过滤掉图片/字体等文件的干扰                   | `string[]` |
-| prefix                             | 在替换模式下，需要添加到源文件顶部的内容，一般为导出等                              | `string[]` |
-| templateString.funcName            | 处理模板字符串时，用于原处替换的函数名称                                            | `string`   |
-| fieldPrefix                        | 生成字段命名时，使用的前前缀字符串，字段命名规则为{prefix}\_{index}，默认值：`intl` | `string`   |
-| versionName                        | 当次运行的版本，内部自动维护，请不要手动传入，命名规则 v{index}｜`string`           |
+| 参数                               | 说明                                                                                   | 类型       |
+| ---------------------------------- | -------------------------------------------------------------------------------------- | ---------- |
+| outputPath(已废弃，兼容原因未删除) |                                                                                        | `string`   |
+| rootPath                           | 源文件或源文件目录                                                                     | `string`   |
+| extractOnly                        | 是否只扫描文件，并不进行替换，如果设置为`false`，则会进行源文件替换，且集成`kiwi-intl` | `boolean`  |
+| whiteList                          | 文件类型白名单，指定只扫描文件类型，可过滤掉图片/字体等文件的干扰                      | `string[]` |
+| prefix                             | 在替换模式下，需要添加到源文件顶部的内容，一般为导出等                                 | `string[]` |
+| templateString.funcName            | 处理模板字符串时，用于原处替换的函数名称                                               | `string`   |
+| fieldPrefix                        | 生成字段命名时，使用的前前缀字符串，字段命名规则为{prefix}\_{index}，默认值：`intl`    | `string`   |
+| versionName                        | 当次运行的版本，内部自动维护，请不要手动传入，命名规则 v{index}｜`string`              |
 
 参数默认值如下：
 
@@ -200,7 +202,6 @@ export default {
 
 1. 不支持某些复杂模板字符串的提取
 2. 部分代码格式化异常（需要额外的格式化）
-3. 只引入了`kiwi-intl`，但仍然需要针对不同项目，自行开发多语言更新逻辑等
 
 ### ChangeLog
 

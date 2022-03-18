@@ -3,6 +3,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import * as chalk from 'chalk'
 import * as prettier from 'prettier'
+import { IMPORTED_I18N_HOOKS } from '../constant'
 /**
  * 去掉文件中的注释
  * @param code
@@ -48,7 +49,7 @@ export function genKey(filePath: string) {
 export function getQuotePath(rootPath: string, filePath: string, versionName: string) {
   const relativePath = filePath.replace(rootPath, '')
   const paths = parsePath(relativePath).map((item) => formatFileName(item)) // 把短横线换成下划线
-  return `kiwiIntl.${versionName}.${paths.join('.')}`
+  return `I18N.${versionName}.${paths.join('.')}`
 }
 
 export interface ReplacementItem {
@@ -84,6 +85,10 @@ export function printToFile(file: string, replaceList: ReplacementItem[], filena
 export function saveFile(ast: ts.SourceFile, fileName: string, prefix?: string[]) {
   const printer = ts.createPrinter()
   let file = printer.printFile(ast)
+  // 导入hooks语句
+  if (!file.includes(IMPORTED_I18N_HOOKS)) {
+    file = IMPORTED_I18N_HOOKS + file
+  }
   if (prefix) {
     file = prefix.join('\n') + '\n' + file
   }
@@ -157,15 +162,16 @@ export function geti18NString(filePath: string) {
   if (relativePath.startsWith('i18n')) {
     relativePath = './' + relativePath
   }
-  const importI18NStr = `import kiwiIntl from '${relativePath}'`
-  return importI18NStr
+  // const importI18NStr = `import kiwiIntl from '${relativePath}'`
+  return `import { useI18n } from '@/i18n/context'`
+  // return importI18NStr
 }
 
 /**
  * 获取输出路径(兼容vscode插件)
  */
 export function getOutputPath() {
-  return resolvePath('./i18n')
+  return resolvePath('./src/i18n')
 }
 
 /**
@@ -190,17 +196,18 @@ const INIT_VERSION_NUMBER = 1
  */
 export function getVersionName() {
   const outputPath = getOutputPath()
+  const basePath = `${outputPath}/langs`
   // 首次生成
-  if (!fs.existsSync(outputPath)) {
+  if (!fs.existsSync(basePath)) {
     return `v${INIT_VERSION_NUMBER}`
   }
   // 获取新的版本号
-  const childPathList = fs.readdirSync(outputPath)
+  const childPathList = fs.readdirSync(basePath)
   const versionExist = []
   for (const childPath of childPathList) {
-    const childPathAbsolute = `${outputPath}/${childPath}`
+    const childPathAbsolute = `${basePath}/${childPath}`
     if (fs.statSync(childPathAbsolute).isDirectory()) {
-      const relativePath = path.relative(outputPath, childPathAbsolute)
+      const relativePath = path.relative(basePath, childPathAbsolute)
       if (relativePath.startsWith('v')) {
         versionExist.push(Number(relativePath.replace('v', '')))
       }

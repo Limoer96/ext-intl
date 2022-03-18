@@ -25,7 +25,7 @@ export interface IConfig {
 }
 
 export const INIT_CONFIG: IConfig = {
-  outputPath: resolvePath('./i18n'),
+  outputPath: resolvePath('./src/i18n'),
   rootPath: resolvePath('./src'),
   langs: ['zh-CN', 'en-US'],
   extractOnly: true,
@@ -39,3 +39,5 @@ export const INIT_CONFIG: IConfig = {
 
 export const CONFIG_FILE_NAME = '.extintl.json'
 export const DEFAULT_LANGUAGE = 'zh-CN'
+export const IGNORE_I18N_PATH = resolvePath('./src/i18n')
+export const IMPORTED_I18N_HOOKS = `import { useI18n } from '@/i18n/context';\n`

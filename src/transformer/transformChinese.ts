@@ -1,12 +1,6 @@
 import * as ts from 'typescript'
 import { DOUBLE_BYTE_REGEX, IConfig } from '../constant'
-import {
-  removeFileComment,
-  saveFile,
-  getVariableFromTmeplateString,
-  getQuotePath,
-  geti18NString,
-} from '../utils/common'
+import { removeFileComment, saveFile, getVariableFromTmeplateString, getQuotePath } from '../utils/common'
 export interface Text {
   key: string
   value: string
@@ -106,7 +100,7 @@ export function transformChinese(code: string, fileName: string) {
   }
   const transformedFile = ts.transform(ast, [transformer]).transformed[0]
   if (!extractOnly && matches.length > 0) {
-    saveFile(transformedFile as any, fileName, [geti18NString(fileName), ...prefix])
+    saveFile(transformedFile as any, fileName, [...prefix])
   }
   return matches
 }

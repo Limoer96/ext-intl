@@ -57,7 +57,7 @@ function writeMultiOutFile(textArr: Text[], targetFilePath: string) {
     if (fileRelativePath.startsWith('/')) {
       fileRelativePath = fileRelativePath.slice(1)
     }
-    filePath = path.resolve(path.resolve(outputPath, versionName, lang), fileRelativePath)
+    filePath = path.resolve(path.resolve(outputPath, 'langs', versionName, lang), fileRelativePath)
     writeOutputFile(textArr, filePath, lang)
   }
 }

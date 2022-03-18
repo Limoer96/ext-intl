@@ -3,22 +3,20 @@ import checkConfig from './utils/checkConfig'
 import { is, resolvePath, getOutputPath, getVersionName } from './utils/common'
 import * as fs from 'fs'
 import { traverseDir } from './traverse'
-import writeTemplateFile from './intl/i18nTemplate'
+import writeI18nTemplateFile from './intl'
 import chalk = require('chalk')
 import writeTotalExportEntry from './utils/writeTotalExportEntry'
 
 export function intl(config?: IConfig) {
   checkConfig(config)
     .then((config: IConfig) => {
-      const { rootPath, whiteList, langs, extractOnly } = config
-      // 处理文件白名单
+      const { rootPath, whiteList, langs } = config
       if (!is(whiteList, 'array') || whiteList.length === 0) {
         config.whiteList = INIT_CONFIG.whiteList
       }
       if (!langs || (is(langs, 'array') && langs.length === 0)) {
         config.langs = INIT_CONFIG.langs
       }
-      // 输出路径使用默认值
       const outDirName = getOutputPath()
       config.rootPath = resolvePath(rootPath)
       config.outputPath = outDirName
@@ -27,8 +25,9 @@ export function intl(config?: IConfig) {
       try {
         fs.mkdirSync(outDirName)
         for (const lang of langs) {
-          const dirPath = config.versionName ? `${outDirName}/${config.versionName}/${lang}` : `${outDirName}/${lang}`
-          // 递归生成文件夹
+          const dirPath = config.versionName
+            ? `${outDirName}/langs/${config.versionName}/${lang}`
+            : `${outDirName}/langs/${lang}`
           fs.mkdirSync(dirPath, { recursive: true })
         }
       } catch (error) {
@@ -47,7 +46,7 @@ export function intl(config?: IConfig) {
       traverseDir(rootPath)
       writeTotalExportEntry(outputPath)
       if (!config.extractOnly) {
-        writeTemplateFile(config.langs)
+        writeI18nTemplateFile(config.langs)
       }
       console.timeEnd('[INFO] complete with ms')
     })

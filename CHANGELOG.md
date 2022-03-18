@@ -70,3 +70,8 @@ const message = intl.get(key, { visitor, name })
 ### 2.1.1(2022/01/30)
 
 - 修复了`basePath`不为`src`目录时替换异常的问题
+
+### 2.2.0(2022/03/18)
+
+- 调整生成文件存放目录
+- 集成了完整的` kiwi-intl``React `运行更新逻辑，请查看[迁移文档](./docs/migrate.md)

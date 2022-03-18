@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { IConfig } from './constant'
+import { IConfig, IGNORE_I18N_PATH } from './constant'
 import { transformChinese } from './transformer/transformChinese'
 import writeOutputFile from './utils/writeOutputFile'
 import writeDirExportEntry from './utils/writeDirExportEntry'
@@ -26,7 +26,9 @@ export function traverseDir(pathName: string) {
     const files = fs.readdirSync(pathName)
     files.forEach((file) => {
       const absPath = path.resolve(pathName, file)
-      traverseDir(absPath)
+      if (absPath !== IGNORE_I18N_PATH) {
+        traverseDir(absPath)
+      }
     })
     // 针对文件夹写入入口文件
     writeDirExportEntry(pathName)

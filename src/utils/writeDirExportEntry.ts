@@ -18,7 +18,7 @@ function writeDirExportEntry(dirPath: string) {
   for (const lang of langs) {
     let filePath = dirPath
     const fileRelativePath = filePath.replace(rootPath, '').substring(1)
-    filePath = path.resolve(path.resolve(outputPath, versionName, lang), fileRelativePath)
+    filePath = path.resolve(path.resolve(outputPath, 'langs', versionName, lang), fileRelativePath)
     if (!fs.existsSync(filePath)) {
       return
     }
