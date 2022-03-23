@@ -75,3 +75,7 @@ const message = intl.get(key, { visitor, name })
 
 - 调整生成文件存放目录
 - 集成了完整的` kiwi-intl``React `运行更新逻辑，请查看[迁移文档](./docs/migrate.md)
+
+### 2.2.1(2022/03/23)
+
+- 修复首次运行生成`.extintl.json`格式化错误的问题
