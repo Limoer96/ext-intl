@@ -224,12 +224,16 @@ export function getVersionName() {
  * @param configFilePath 配置开始搜索的目录
  * @returns 格式化后的文本
  */
-export function formatFileWithConfig(text: string, configFilePath?: string) {
+export function formatFileWithConfig(
+  text: string,
+  configFilePath?: string,
+  parser: prettier.BuiltInParserName = 'typescript'
+) {
   if (!configFilePath) {
     configFilePath = process.cwd()
   }
   let options: prettier.Options = {
-    parser: 'typescript',
+    parser,
     bracketSpacing: true,
     jsxBracketSameLine: true,
     singleQuote: true,
@@ -243,7 +247,7 @@ export function formatFileWithConfig(text: string, configFilePath?: string) {
     if (configFinded) {
       options = {
         ...configFinded,
-        parser: 'typescript',
+        parser,
       }
     }
   } catch (error) {

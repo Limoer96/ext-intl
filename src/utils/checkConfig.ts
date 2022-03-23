@@ -51,7 +51,10 @@ function checkConfig(config: IConfig) {
               )
               process.exit(1)
             }
-            fs.writeFileSync(resolvePath(CONFIG_FILE_NAME), formatFileWithConfig(JSON.stringify(INIT_CONFIG)))
+            fs.writeFileSync(
+              resolvePath(CONFIG_FILE_NAME),
+              formatFileWithConfig(JSON.stringify(INIT_CONFIG), undefined, 'json-stringify')
+            )
             console.log(chalk.green('[INFO] run with initial configuration...'))
             resolve(INIT_CONFIG)
           })
