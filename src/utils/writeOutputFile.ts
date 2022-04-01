@@ -1,10 +1,11 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as chalk from 'chalk'
-import * as mkdirp from 'mkdirp'
 import { Text } from '../transformer/transformChinese'
-import { IConfig, DEFAULT_LANGUAGE } from '../constant'
-import { formatFileWithConfig, measureText, useTs } from './common'
+import { DEFAULT_LANGUAGE, useTs } from '../constant'
+import { measureText } from './common'
+import { ExtConfig } from '../interface'
+import { formatFileWithConfig } from './format'
 
 /**
  * 将提取结果写入到文件
@@ -30,7 +31,7 @@ function writeOutputFile(textArr: Text[], targetFilePath: string, lang: string) 
   const dirname = path.dirname(targetFilePath)
   const exist = fs.existsSync(dirname)
   if (!exist) {
-    mkdirp.sync(dirname)
+    fs.mkdirSync(dirname, { recursive: true })
   }
   const extName = useTs ? '.ts' : '.js'
   const fileName = targetFilePath.replace(path.parse(targetFilePath).ext, extName)
@@ -46,9 +47,8 @@ function writeOutputFile(textArr: Text[], targetFilePath: string, lang: string) 
  * @param textArr 扫描到的词条数组
  * @param targetFilePath 当前扫描文件路径
  */
-
 function writeMultiOutFile(textArr: Text[], targetFilePath: string) {
-  const { langs, outputPath, rootPath, versionName } = <IConfig>global['intlConfig']
+  const { langs, outputPath, versionName, rootPath } = <ExtConfig>global['intlConfig']
   if (textArr.length === 0) return
   for (const lang of langs) {
     let filePath = targetFilePath
