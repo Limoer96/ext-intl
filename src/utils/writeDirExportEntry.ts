@@ -1,19 +1,19 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as chalk from 'chalk'
-import * as mkdirp from 'mkdirp'
-import { IConfig } from '../constant'
-import { formatFileName, formatFileWithConfig, useTs } from './common'
+import { ExtConfig } from '../interface'
+import { formatFileName } from './common'
+import { useTs } from '../constant'
+import { formatFileWithConfig } from './format'
 
 /**
  * 给每个文件夹写入一个导出入口`index.js/ts`
- * @param textArr 扫描到的词条数组
- * @param targetFilePath 当前扫描文件路径
+ * @param dirPath 扫描到的某个文件夹
  */
 
 function writeDirExportEntry(dirPath: string) {
-  const { whiteList, rootPath, outputPath, langs, versionName } = <IConfig>global['intlConfig']
-  const extname = '.' + (useTs() ? 'ts' : 'js')
+  const { whiteList, outputPath, langs, versionName, rootPath } = <ExtConfig>global['intlConfig']
+  const extname = '.' + (useTs ? 'ts' : 'js')
   // 处理文件路径
   for (const lang of langs) {
     let filePath = dirPath
@@ -49,7 +49,7 @@ function writeDirExportEntry(dirPath: string) {
     const entryPath = path.resolve(filePath, `_index${extname}`)
     const exist = fs.existsSync(filePath)
     if (!exist) {
-      mkdirp.sync(filePath)
+      fs.mkdirSync(filePath, { recursive: true })
     }
     try {
       fs.writeFileSync(entryPath, content)

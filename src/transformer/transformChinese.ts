@@ -1,5 +1,6 @@
 import * as ts from 'typescript'
-import { DOUBLE_BYTE_REGEX, IConfig } from '../constant'
+import { DOUBLE_BYTE_REGEX } from '../constant'
+import { ExtConfig } from '../interface'
 import { removeFileComment, saveFile, getVariableFromTmeplateString, getQuotePath } from '../utils/common'
 export interface Text {
   key: string
@@ -12,9 +13,10 @@ export interface Text {
  * @param fileName 当前文件路径名
  */
 export function transformChinese(code: string, fileName: string) {
-  const { extractOnly, prefix, templateString, fieldPrefix, versionName, rootPath } = <IConfig>global['intlConfig']
+  const { extractOnly, prefix, templateString, fieldPrefix, versionName, rootPath } = <ExtConfig>global['intlConfig']
   const matches: Array<Text> = []
   const ast = ts.createSourceFile('', code, ts.ScriptTarget.ES2015, true, ts.ScriptKind.TSX)
+  const factory = ts.factory
   const quotePath = getQuotePath(rootPath, fileName, versionName)
   let index = 1
   const transformer = <T extends ts.Node>(context: ts.TransformationContext) => (rootNode: T) => {
@@ -29,7 +31,7 @@ export function transformChinese(code: string, fileName: string) {
               value: text,
               comment: `
                 /**
-                 * ${text} 
+                 * ${text}
                  */`,
             })
             index += 1
@@ -38,7 +40,7 @@ export function transformChinese(code: string, fileName: string) {
               const parentNodeKind = node.parent.kind
               const result =
                 parentNodeKind === ts.SyntaxKind.JsxAttribute ? `{${quotePath}.${name}}` : `${quotePath}.${name}`
-              return ts.createIdentifier(result)
+              return factory.createIdentifier(result)
             }
           }
           break
@@ -53,12 +55,12 @@ export function transformChinese(code: string, fileName: string) {
               value: noCommentText,
               comment: `
               /**
-               * ${noCommentText} 
+               * ${noCommentText}
                */`,
             })
             index += 1
             if (!extractOnly) {
-              return ts.createJsxText(`{${quotePath}.${name}}`)
+              return factory.createJsxText(`{${quotePath}.${name}}`)
             }
           }
           break
@@ -74,17 +76,19 @@ export function transformChinese(code: string, fileName: string) {
                 value: text.replace(/\$(?=\{)/g, ''), // 先行断言，去掉`$`
                 comment: `
                 /**
-                 * ${text} 
+                 * ${text}
                  */`,
               })
               index += 1
               // 返回新的节点(函数调用)
               const variableList: string[] = getVariableFromTmeplateString(text)
-              const objParam = ts.createObjectLiteral(
-                variableList.map((variable) => ts.createPropertyAssignment(variable, ts.createIdentifier(variable)))
+              const objParam = factory.createObjectLiteralExpression(
+                variableList.map((variable) =>
+                  factory.createPropertyAssignment(variable, factory.createIdentifier(variable))
+                )
               )
-              return ts.createCall(ts.createIdentifier(templateString.funcName), undefined, [
-                ts.createIdentifier(`${quotePath}.${name}`),
+              return factory.createCallExpression(factory.createIdentifier(templateString.funcName), undefined, [
+                factory.createIdentifier(`${quotePath}.${name}`),
                 objParam,
               ])
             } else {

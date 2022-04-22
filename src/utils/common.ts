@@ -2,8 +2,8 @@ import * as ts from 'typescript'
 import * as path from 'path'
 import * as fs from 'fs'
 import * as chalk from 'chalk'
-import * as prettier from 'prettier'
-import { IMPORTED_I18N_HOOKS } from '../constant'
+import { IMPORTED_I18N_HOOKS, INIT_VERSION_NUMBER } from '../constant'
+import { formatFileWithConfig } from './format'
 /**
  * 去掉文件中的注释
  * @param code
@@ -21,9 +21,12 @@ export function removeFileComment(code: string, fileName: string) {
   return printer.printFile(sourceFile)
 }
 
-export const BasePath = path.resolve(__dirname)
-
-// 大写首字母
+/**
+ * 大写首字母，如果其索引不为0的话
+ * @param str
+ * @param idx
+ * @returns
+ */
 function upperCase(str: string, idx: number) {
   if (idx === 0) {
     return str
@@ -31,51 +34,33 @@ function upperCase(str: string, idx: number) {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
 }
-
-export function parsePath(fileRelativePath: string) {
+/**
+ * 按分割符'/'返回解析后的路径列表
+ * @param fileRelativePath
+ * @returns
+ */
+function parsePath(fileRelativePath: string) {
   const { dir, name } = path.parse(fileRelativePath)
-  const paths = []
+  const paths: string[] = []
   const spliter = /[\/\\\\]/
   paths.push(...dir.split(spliter).filter(Boolean))
   paths.push(name)
   return paths
 }
 
-export function genKey(filePath: string) {
-  const paths = parsePath(filePath)
-  return paths.map((item, idx) => upperCase(item, idx).replace(/-/g, '')).join('')
-}
-// 获取引用路径
+/**
+ * 获取应用路径字符
+ * @param rootPath
+ * @param filePath
+ * @param versionName
+ * @returns
+ */
 export function getQuotePath(rootPath: string, filePath: string, versionName: string) {
   const relativePath = filePath.replace(rootPath, '')
   const paths = parsePath(relativePath).map((item) => formatFileName(item)) // 把短横线换成下划线
   return `I18N.${versionName}.${paths.join('.')}`
 }
 
-export interface ReplacementItem {
-  pos: number
-  end: number
-  text: string | number
-}
-/**
- * 批量文件替换(已不再使用)
- * @param file 文件的字符串形式
- * @param replaceList 待替换的元素列表
- * @param filename 待写入文件路径
- * @param prefix 可写入到源文件中的顶部字符串，一般为包引入等
- */
-export function printToFile(file: string, replaceList: ReplacementItem[], filename: string, prefix?: string) {
-  if (replaceList.length === 0) return
-  replaceList.sort((a, b) => b.pos - a.pos) // 按照位置从大到小排序
-  for (const item of replaceList) {
-    const { pos, end, text } = item
-    file = file.substring(0, pos) + text + file.substring(end)
-  }
-  if (prefix) {
-    file = prefix + file
-  }
-  fs.writeFileSync(filename, file)
-}
 /**
  * 转换后的文件保存到文件
  * @param ast 转换后的ast
@@ -95,7 +80,7 @@ export function saveFile(ast: ts.SourceFile, fileName: string, prefix?: string[]
   try {
     fs.writeFileSync(fileName, formatFileWithConfig(file))
   } catch (error) {
-    console.log(chalk.red(`[ERROR] failed to generate file: ${fileName}`))
+    console.log(chalk.red(`[ERROR] 无法生成文件，请手动替换: ${fileName}`))
   }
 }
 
@@ -114,6 +99,12 @@ export function measureText(text: string, template: boolean) {
   return res
 }
 
+/**
+ * 类型判断
+ * @param obj
+ * @param type
+ * @returns
+ */
 export function is(obj: any, type: string) {
   const typeString: string = Object.prototype.toString.call(obj)
   return typeString.substring(8, typeString.length - 1).toLowerCase() === type
@@ -139,10 +130,10 @@ export function getVariableFromTmeplateString(text: string): string[] {
 }
 
 /**
- * 生成绝对路径
+ * 基于当前目录生成绝对路径
  * @param pathName
  */
-export function resolvePath(pathName) {
+export function resolvePath(pathName: string) {
   return path.resolve(process.cwd(), pathName)
 }
 /**
@@ -150,21 +141,6 @@ export function resolvePath(pathName) {
  */
 export function useTs(): boolean {
   return fs.existsSync(resolvePath('tsconfig.json'))
-}
-/**
- * 获取当前页面导入intl的语句
- * @param filePath
- */
-export function geti18NString(filePath: string) {
-  const { dir } = path.parse(filePath)
-  const i18nEntryFilePath = resolvePath('./src/i18n')
-  let relativePath = path.relative(dir, i18nEntryFilePath).replace(/\\/g, '/')
-  if (relativePath.startsWith('i18n')) {
-    relativePath = './' + relativePath
-  }
-  // const importI18NStr = `import kiwiIntl from '${relativePath}'`
-  return `import { useI18n } from '@/i18n/context'`
-  // return importI18NStr
 }
 
 /**
@@ -175,7 +151,9 @@ export function getOutputPath() {
 }
 
 /**
- * formatFileName
+ * 格式化文件名称
+ * @param fnameStr
+ * @returns
  */
 export function formatFileName(fnameStr: string) {
   const fileNameArr = fnameStr.split('-')
@@ -189,7 +167,6 @@ export function formatFileName(fnameStr: string) {
     .join('')
 }
 
-const INIT_VERSION_NUMBER = 1
 /**
  * 获取当次版本号
  * @returns
@@ -218,42 +195,22 @@ export function getVersionName() {
   return `v${lastVerion + 1 || INIT_VERSION_NUMBER}`
 }
 
+export function isAndEmpty(value: any, type: string, validator: (value: any) => boolean) {
+  return is(value, type) && validator(value)
+}
+
+export const log = console.log
+
 /**
- * 使用项目中的prettier配置进行格式化
- * @param text 需要格式化的文本
- * @param configFilePath 配置开始搜索的目录
- * @returns 格式化后的文本
+ * 异步处理函数
+ * @param promise
+ * @returns
  */
-export function formatFileWithConfig(
-  text: string,
-  configFilePath?: string,
-  parser: prettier.BuiltInParserName = 'typescript'
-) {
-  if (!configFilePath) {
-    configFilePath = process.cwd()
-  }
-  let options: prettier.Options = {
-    parser,
-    bracketSpacing: true,
-    jsxBracketSameLine: true,
-    singleQuote: true,
-    trailingComma: 'all',
-    arrowParens: 'avoid',
-    semi: false,
-    useTabs: true,
-  }
+export async function handle<DataType = any>(promise: Promise<DataType>): Promise<[DataType, any]> {
   try {
-    const configFinded = prettier.resolveConfig.sync(configFilePath)
-    if (configFinded) {
-      options = {
-        ...configFinded,
-        parser,
-      }
-    }
-  } catch (error) {
-    console.log(
-      chalk.yellow('[WARNING] can not find perttier config file in your project, use default config instead!')
-    )
+    const data = await promise
+    return [data, undefined]
+  } catch (err) {
+    return [undefined, err]
   }
-  return prettier.format(text, options)
 }
