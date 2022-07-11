@@ -7,6 +7,16 @@ import { measureText } from './common'
 import { ExtConfig } from '../interface'
 import { formatFileWithConfig } from './format'
 
+function getText(textObj: Text, lang: string) {
+  const isMainLang = lang === 'CHINESE'
+  const text = isMainLang ? textObj.value : textObj[lang] || ''
+  return text
+    .replace(/;/g, '')
+    .replace(/[\r\n]/g, '')
+    .replace(/\$/g, '')
+    .replace(/[`'"]/g, '')
+}
+
 /**
  * 将提取结果写入到文件
  * @param textArr 提取词条数组
@@ -16,10 +26,7 @@ function writeOutputFile(textArr: Text[], targetFilePath: string, lang: string) 
   let textStr = textArr
     .map(
       (text) =>
-        `${text.comment.endsWith('\n') ? text.comment : `${text.comment}\n`}${text.key}: '${measureText(
-          text.value,
-          lang !== DEFAULT_LANGUAGE
-        )}',`
+        `${text.comment.endsWith('\n') ? text.comment : `${text.comment}\n`}${text.key}: '${getText(text, lang)}',`
     )
     .join('\n')
   textStr = 'export default {\n' + textStr + '\n}'

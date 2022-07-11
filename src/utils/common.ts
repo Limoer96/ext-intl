@@ -1,6 +1,7 @@
 import * as ts from 'typescript'
 import * as path from 'path'
 import * as fs from 'fs'
+import * as fsPromise from 'fs/promises'
 import * as chalk from 'chalk'
 import { IMPORTED_I18N_HOOKS, INIT_VERSION_NUMBER } from '../constant'
 import { formatFileWithConfig } from './format'
@@ -212,5 +213,17 @@ export async function handle<DataType = any>(promise: Promise<DataType>): Promis
     return [data, undefined]
   } catch (err) {
     return [undefined, err]
+  }
+}
+
+/**
+ * 多语言根目录创建（如果已经存在则跳过）
+ */
+export async function mkRootDirIfNeeded() {
+  const rootDir = getOutputPath()
+  try {
+    await fsPromise.access(rootDir)
+  } catch (error) {
+    await fsPromise.mkdir(rootDir, { recursive: true })
   }
 }

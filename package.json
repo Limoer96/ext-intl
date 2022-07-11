@@ -17,6 +17,9 @@
   "license": "MIT",
   "dependencies": {
     "chalk": "4.1.2",
+    "commander": "^9.3.0",
+    "graphql": "^16.5.0",
+    "graphql-request": "^4.3.0",
     "inquirer": "^8.2.2",
     "kiwi-intl": "^1.2.4",
     "prettier": "^2.6.1",

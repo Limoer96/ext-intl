@@ -27,16 +27,3 @@ export interface ExtConfig {
 }
 
 export interface ExtCustomConfig extends Omit<ExtConfig, 'outputPath' | 'versionName'> {}
-
-export interface ReplacementItem {
-  pos: number
-  end: number
-  text: string | number
-}
-
-export interface OriginEntryItem {
-  key: string
-  mainLang: string
-  mainLangText: string
-  langs: any
-}
