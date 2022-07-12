@@ -61,6 +61,6 @@ export async function upload({ origin, accessKey, entries }: UploadConfig) {
     log(chalk.yellow('无可上传的词条'))
     return
   }
-  await request(origin, postDoc, { accessKey })
+  await request(origin, postDoc, { accessKey, entries })
   log(chalk.green('词条已推送至远程'))
 }

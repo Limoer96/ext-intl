@@ -8,7 +8,7 @@ import { ExtCustomConfig } from './interface'
 export { sync } from './commands/sync'
 export { start } from './commands/generate'
 export { checkConfig } from './commands/config'
-
+export { update } from './commands/update'
 export async function intl(config?: ExtCustomConfig) {
   // try {
   const conf = await checkConfig(config)

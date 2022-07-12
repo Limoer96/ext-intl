@@ -3,12 +3,15 @@ import * as chalk from 'chalk'
 import { Text } from '../../transformer/transformChinese'
 import { log } from '../../utils/common'
 import { upload, UploadConfig, UploadEntryItem } from './index'
+import { ExtConfig } from '../config/interface'
 
 interface UploadActionConfig extends Omit<UploadConfig, 'entries'> {
   unMatchedList: Text[]
 }
 
 export async function uploadAction(config: UploadActionConfig) {
+  const intlConfig = <ExtConfig>global['intlConfig']
+  const mainLang = intlConfig['langs'][0]
   if (config.unMatchedList && config.unMatchedList.length > 0) {
     const answer = await inquirer.prompt([
       {
@@ -20,7 +23,7 @@ export async function uploadAction(config: UploadActionConfig) {
     if (answer.shouldUpload) {
       const entries: UploadEntryItem[] = config.unMatchedList.map((item) => ({
         langs: {
-          CHINESE: item.value,
+          [mainLang]: item.value,
         },
       }))
       await upload({ origin: config.origin, accessKey: config.accessKey, entries })

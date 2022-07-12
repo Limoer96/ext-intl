@@ -2,13 +2,13 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as chalk from 'chalk'
 import { Text } from '../transformer/transformChinese'
-import { DEFAULT_LANGUAGE, useTs } from '../constant'
-import { measureText } from './common'
+import { useTs } from '../constant'
 import { ExtConfig } from '../interface'
 import { formatFileWithConfig } from './format'
 
 function getText(textObj: Text, lang: string) {
-  const isMainLang = lang === 'CHINESE'
+  const config = <ExtConfig>global['intlConfig']
+  const isMainLang = lang === config.langs[0]
   const text = isMainLang ? textObj.value : textObj[lang] || ''
   return text
     .replace(/;/g, '')

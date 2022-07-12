@@ -5,6 +5,7 @@ import * as fsPromise from 'fs/promises'
 import * as chalk from 'chalk'
 import { IMPORTED_I18N_HOOKS, INIT_VERSION_NUMBER } from '../constant'
 import { formatFileWithConfig } from './format'
+import { Text } from '../transformer/transformChinese'
 /**
  * 去掉文件中的注释
  * @param code
@@ -226,4 +227,20 @@ export async function mkRootDirIfNeeded() {
   } catch (error) {
     await fsPromise.mkdir(rootDir, { recursive: true })
   }
+}
+
+/**
+ * 匹配到词条去除重复
+ * @param textSet 当前已去重词条列表
+ * @param list 需要去重的词条数据
+ * @returns 自身去重和已去重列表去重后的结果
+ */
+export function removeDuplicatedText(textSet: Text[], list: Text[]) {
+  const result: Text[] = []
+  for (const item of list) {
+    if (!textSet.find((one) => one.value === item.value) && !result.find((i) => i.value === item.value)) {
+      result.push(item)
+    }
+  }
+  return result
 }

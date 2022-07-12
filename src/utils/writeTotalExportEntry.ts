@@ -7,9 +7,8 @@ import { formatFileWithConfig } from './format'
 
 function getExportContentByLang(lang: string, files: string[]) {
   const list = ['{']
-  const countryCode = lang.split('-')[1]
   for (const file of files) {
-    list.push(`'${file}': ${file}_${countryCode},`)
+    list.push(`'${file}': ${file}_${lang},`)
   }
   list.push('}')
   return list.join('')
@@ -29,13 +28,11 @@ function writeTotalExportEntry() {
       .filter((file) => fs.statSync(`${basePath}/${file}`).isDirectory() && file.includes('v'))
     for (const file of files) {
       for (const lang of langs) {
-        const countryCode = lang.split('-')[1]
-        content += `import ${file}_${countryCode} from './${file}/${lang}/_index';`
+        content += `import ${file}_${lang} from './${file}/${lang}/_index';`
       }
     }
     for (const lang of langs) {
-      const langName = lang.replace('-', '')
-      content += `export const ${langName} = ${getExportContentByLang(lang, files)};`
+      content += `export const ${lang} = ${getExportContentByLang(lang, files)};`
     }
   } catch (error) {}
   content = formatFileWithConfig(content)

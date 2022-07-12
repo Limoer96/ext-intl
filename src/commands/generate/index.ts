@@ -4,7 +4,7 @@ import { traverseDir } from '../../traverse'
 import writeI18nTemplateFile from '../../intl'
 import writeTotalExportEntry from '../../utils/writeTotalExportEntry'
 import { ExtConfig } from '../config/interface'
-import { mkRootDirIfNeeded } from '../../utils/common'
+import { mkRootDirIfNeeded, removeDuplicatedText } from '../../utils/common'
 import { readEntryFile } from '../../utils/readEntryFile'
 import { Text } from '../../transformer/transformChinese'
 import { uploadAction } from '../sync/uploadAction'
@@ -32,7 +32,7 @@ export async function start(config: ExtConfig) {
     }
     // 2. 遍历文件（提取词条/写入多语言模版等）
     traverseDir(rootPath, (entries) => {
-      unMatchedList.push(...entries)
+      unMatchedList.push(...removeDuplicatedText(unMatchedList, entries))
     })
     // 3. 写入词条入口文件
     writeTotalExportEntry()

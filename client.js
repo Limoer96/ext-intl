@@ -4,6 +4,7 @@ const { intl } = require('./dist/index')
 const { generateConfigFile, readConfigFile, getMergedConfig, checkConfig } = require('./dist/commands/config')
 const { sync } = require('./dist/commands/sync')
 const { start } = require('./dist/commands/generate')
+const { update } = require('./dist/commands/update')
 
 const program = new Command()
 
@@ -25,7 +26,15 @@ program
     await sync(config.origin, config.accessKey)
     await start(config)
   })
-program.command('update').description('同步远程词库数据并更新多本次词条')
+program
+  .command('update')
+  .description('同步远程词库数据并更新多本次词条')
+  .action(async () => {
+    const localConfig = await readConfigFile()
+    const config = getMergedConfig(localConfig)
+    await sync(config.origin, config.accessKey)
+    await update(config.langs[0])
+  })
 program
   .command('config')
   .description('配置脚本')
