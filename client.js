@@ -1,8 +1,14 @@
 #!/usr/bin/env node
 const { Command } = require('commander')
-const { sync, start, update } = require('./dist/index')
-const { generateConfigFile, readConfigFile, getMergedConfig, checkConfig } = require('./dist/commands/config')
-
+const {
+  sync,
+  start,
+  update,
+  generateConfigFile,
+  readConfigFile,
+  getMergedConfig,
+  checkConfig,
+} = require('./dist/index')
 const program = new Command()
 
 program.name('ext-intl').description('多语言脚本').version('3.0.0')

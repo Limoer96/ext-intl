@@ -4,9 +4,9 @@
 
 ### 功能
 
-1. 提取指定目录下的所有中文词条
+1. 提取指定目录下的所有中文词条，支持上传到远程词库平台（v3.0.0 及以上版本）
 
-2. 词条自动命名，基于自定义命名前缀和计数，支持词条原处替换(可选)
+2. 支持词条原处替换(可选)
 
 3. 按源目录结构生成多语言词条文件
 
@@ -14,17 +14,42 @@
 
 5. 可多次运行，增量提取（需要 v2.1.0 及以上版本）
 
+6. 和词库平台联动，自动填充非中文词条/词条翻译更新
+
 ### 使用
+
+> 注意：若未使用多语言词库平台，请使用`v2.1.x`版本
 
 #### API 调用
 
 1. `yarn add --dev ext-intl`
-2. 新建`xx.js`，写入如下代码：
+2. 新建`xx.js`：
 
 ```js
-const { intl } = require('ext-intl')
+const {
+  sync,
+  start,
+  update,
+  generateConfigFile,
+  readConfigFile,
+  checkConfig,
+} = require('ext-intl')
 const config = {...}
-intl(config)
+// 生成配置文件
+generateConfigFile(true)
+// 读取配置文件
+readConfigFile()
+// 检测配置文件，如果存在，直接返回，否则将会在本地生成
+checkConfig({...initConfig})
+  .then(conf => {
+    console.log(conf)
+  })
+// 同步远程词条数据
+sync(config.origin, config.accessKey)
+// 开启一次完成的提取
+start(config)
+// 进行一次本次词条更新
+update(config.langs[0])
 ```
 
 3. 项目根目录下运行`node xx.js`
@@ -39,47 +64,48 @@ intl(config)
     ...
     "scripts": {
       ...
-      "intl": "extintl"
+      "intl:config": "extintl config -o",
+      "intl:sync": "extintl sync",
+      "intl:start": "extintl start",
+      "intl:update": "extintl update"
     }
   }
 ```
 
-3. 运行`yarn intl`即可
-
-#### 使用`vs code`插件（推荐）
-
-> 该插件暂时无法使用
-
-`ext-intl`已经支持`VS Code`插件，使用更简单方便。详情见[ext-intl(i18n Tool)](https://marketplace.visualstudio.com/items?itemName=limoer.ext-intl)
+3. 运行`yarn intl:xx`即可
 
 ### API
 
 ```js
 /**
- *  提取词条入口函数
- *  config {IConfig} 配置项
+ * 同步远程词条并写入到本地
+ * @param origin 远程地址
+ * @param accessKey 配置的应用访问key
+ * @returns
  */
-function intl(config?: Iconfig){...}
+function sync(origin: string, accessKey: string): Promise<void>;
 
-interface IConfig {
-  outputPath: string // 已废弃，设置后不起作用，默认'resolvePath('./i18n')'
-  rootPath: string
-  extractOnly: boolean
-  whiteList: string[]
-  prefix?: string[]
-  // 用于处理模板字符串的配置
-  templateString?: {
-    funcName: string
-  }
-  /**
-   * 命名时字段前缀默认为`intl`
-   */
-  fieldPrefix?: string
-  /**
-   * 某次运行时的版本（请不要手动传入）
-   */
-  versionName?: string
-}
+/**
+ * 开启一次完整的词条提取
+ * @param config 配置
+ * @returns
+ */
+function start(config: ExtConfig): Promise<void>;
+
+/**
+ * 更新本地已经维护好的词条信息
+ * @param mainLangType 多语言环境下的主要语言（不需要翻译）
+ */
+function update(mainLangType: string): Promise<void>;
+
+/**
+ * 检查配置的流程：
+ * 1. 如果传入了config，则直接使用config以及默认配置合并
+ * 2. 如果没有传入config，则会寻找本地配置文件
+ * 3. 如果本地配置文件不存在，则会询问是否使用默认配置生成配置文件
+ * 4. 读取读取传入config或者配置文件config，合并后返回
+ */
+function checkConfig(config: ExtCustomConfig): Promise<ExtConfig>;
 ```
 
 ### 配置项
@@ -94,6 +120,8 @@ interface IConfig {
 | templateString.funcName            | 处理模板字符串时，用于原处替换的函数名称                                               | `string`   |
 | fieldPrefix                        | 生成字段命名时，使用的前前缀字符串，字段命名规则为{prefix}\_{index}，默认值：`intl`    | `string`   |
 | versionName                        | 当次运行的版本，内部自动维护，请不要手动传入，命名规则 v{index}｜`string`              |
+| origin                             | 词库平台的 OpenAPI 地址（graphql 实现）                                                | `string`   |
+| accessKey                          | 词库平台应用的访问权限 key                                                             | `string`   |
 
 参数默认值如下：
 
@@ -109,92 +137,24 @@ export const DEFAULT_CONFIG: IConfig = {
     funcName: 'kiwiIntl.get',
   },
   fieldPrefix: 'intl',
+  origin: '',
+  accessKey: '',
 }
 ```
 
-### 示例
+### 一般使用步骤
 
-初始目录结构：
+#### 首次运行
 
-![初始结构](https://ae01.alicdn.com/kf/H4e563770ffb245c7882cab09f3647a04K.jpg)
+1. 运行`yarn intl:config`生成配置文件，并修改
+2. 运行`yarn intl:start` 并在`extractOnly: true`模式下提取中文词条，提取完成后，根据提示上传至词库平台
+3. 在词库平台上维护相关词条，维护完成后，再次运行`yarn intl:start`进行一次完整的提取，至此，多语言提取和替换工作完毕
+4. 和首次运行类似，**增量提取**可以不用执行步骤*1*生成配置文件
 
-运行流程：
+#### 更新多语言词条翻译
 
-![运行流程](https://s1.ax1x.com/2020/07/08/UVylQO.gif)
-![运行结果](https://s1.ax1x.com/2020/07/08/UVyhlT.gif)
-
-完成后结构：
-
-![完成结构](https://s1.ax1x.com/2020/07/08/UV6tuF.png)
-
-源文件内容：
-
-```js
-import React from 'react'
-import logo from './logo.svg'
-import './App.css'
-
-function App() {
-  const name = '张珊'
-  const alias = 'limoer'
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>{欢迎页面}</p>
-        <p>{name}</p>
-        <p>{`你好${alias}，再见`}</p>
-      </header>
-    </div>
-  )
-}
-
-export default App
-```
-
-替换后的文件内容为：
-
-```js
-import kiwiIntl, { langMap } from './i18n'
-import React, { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
-function App() {
-  const name = kiwiIntl.v1.App.intl_1
-  const alias = 'limoer'
-  // 以下切换多语言为手动添加
-  const [_, forceUpdate] = useState()
-  function handleChangeLang() {
-    kiwiIntl.setLang(langMap['en-US'])
-    forceUpdate({})
-  }
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>{kiwiIntl.v1.App.intl2}</p>
-        <p>{name}</p>
-        <p>{kiwiIntl.get(kiwiIntl.v1.App.intl3, { alias: alias })}</p>
-        <button onClick={handleChangeLang}>english</button>
-      </header>
-    </div>
-  )
-}
-export default App
-```
-
-词条文件为：
-
-```js
-export default {
-  // 张珊
-  App1: '张珊',
-  // 欢迎页面;
-  App2: '欢迎页面',
-  // `你好${alias}，再见`
-  App3: '你好{alias}，再见',
-}
-```
+1. 在词库平台上完成对词条多语言的更新维护（请注意不要修改词条 key）
+2. 运行`yarn intl:update`同步词条到本地，并进行词条翻译的更新
 
 ### 已知问题
 
@@ -206,10 +166,3 @@ export default {
 ### ChangeLog
 
 [查看更新日志](./CHANGELOG.md)
-
-<style>
-  img {
-    max-width: 600px;
-    height: auto;
-  }
-</style>
