@@ -1,9 +1,11 @@
 import * as ts from 'typescript'
 import * as path from 'path'
 import * as fs from 'fs'
+import * as fsPromise from 'fs/promises'
 import * as chalk from 'chalk'
 import { IMPORTED_I18N_HOOKS, INIT_VERSION_NUMBER } from '../constant'
 import { formatFileWithConfig } from './format'
+import { Text } from '../transformer/transformChinese'
 /**
  * 去掉文件中的注释
  * @param code
@@ -21,19 +23,6 @@ export function removeFileComment(code: string, fileName: string) {
   return printer.printFile(sourceFile)
 }
 
-/**
- * 大写首字母，如果其索引不为0的话
- * @param str
- * @param idx
- * @returns
- */
-function upperCase(str: string, idx: number) {
-  if (idx === 0) {
-    return str
-  } else {
-    return str.charAt(0).toUpperCase() + str.slice(1)
-  }
-}
 /**
  * 按分割符'/'返回解析后的路径列表
  * @param fileRelativePath
@@ -82,21 +71,6 @@ export function saveFile(ast: ts.SourceFile, fileName: string, prefix?: string[]
   } catch (error) {
     console.log(chalk.red(`[ERROR] 无法生成文件，请手动替换: ${fileName}`))
   }
-}
-
-/**
- * 处理匹配到的原始词条
- * @param text 原始词条
- * @param template 是否生成模板
- */
-export function measureText(text: string, template: boolean) {
-  if (template) return ''
-  const res = text
-    .replace(/;/g, '')
-    .replace(/[\r\n]/g, '')
-    .replace(/\$/g, '')
-    .replace(/[`'"]/g, '')
-  return res
 }
 
 /**
@@ -213,4 +187,32 @@ export async function handle<DataType = any>(promise: Promise<DataType>): Promis
   } catch (err) {
     return [undefined, err]
   }
+}
+
+/**
+ * 多语言根目录创建（如果已经存在则跳过）
+ */
+export async function mkRootDirIfNeeded() {
+  const rootDir = getOutputPath()
+  try {
+    await fsPromise.access(rootDir)
+  } catch (error) {
+    await fsPromise.mkdir(rootDir, { recursive: true })
+  }
+}
+
+/**
+ * 匹配到词条去除重复
+ * @param textSet 当前已去重词条列表
+ * @param list 需要去重的词条数据
+ * @returns 自身去重和已去重列表去重后的结果
+ */
+export function removeDuplicatedText(textSet: Text[], list: Text[]) {
+  const result: Text[] = []
+  for (const item of list) {
+    if (!textSet.find((one) => one.value === item.value) && !result.find((i) => i.value === item.value)) {
+      result.push(item)
+    }
+  }
+  return result
 }

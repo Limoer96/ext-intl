@@ -3,8 +3,8 @@ import * as chalk from 'chalk'
 import getI18nTemplateString from './i18n'
 import getTypingTemplateString from './typing'
 import contextTemplate from './context'
-import { ExtConfig } from '../interface'
 import { formatFileWithConfig } from '../utils/format'
+import { ExtConfig } from '../commands/config/interface'
 /**
  * 写入i18n模版文件
  */

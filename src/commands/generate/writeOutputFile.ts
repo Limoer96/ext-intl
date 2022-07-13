@@ -1,11 +1,21 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as chalk from 'chalk'
-import { Text } from '../transformer/transformChinese'
-import { DEFAULT_LANGUAGE, useTs } from '../constant'
-import { measureText } from './common'
-import { ExtConfig } from '../interface'
-import { formatFileWithConfig } from './format'
+import { Text } from '../../transformer/transformChinese'
+import { useTs } from '../../constant'
+import { formatFileWithConfig } from '../../utils/format'
+import { ExtConfig } from '../config/interface'
+
+function getText(textObj: Text, lang: string) {
+  const config = <ExtConfig>global['intlConfig']
+  const isMainLang = lang === config.langs[0]
+  const text = isMainLang ? textObj.value : textObj[lang] || ''
+  return text
+    .replace(/;/g, '')
+    .replace(/[\r\n]/g, '')
+    .replace(/\$/g, '')
+    .replace(/[`'"]/g, '')
+}
 
 /**
  * 将提取结果写入到文件
@@ -16,10 +26,7 @@ function writeOutputFile(textArr: Text[], targetFilePath: string, lang: string) 
   let textStr = textArr
     .map(
       (text) =>
-        `${text.comment.endsWith('\n') ? text.comment : `${text.comment}\n`}${text.key}: '${measureText(
-          text.value,
-          lang !== DEFAULT_LANGUAGE
-        )}',`
+        `${text.comment.endsWith('\n') ? text.comment : `${text.comment}\n`}${text.key}: '${getText(text, lang)}',`
     )
     .join('\n')
   textStr = 'export default {\n' + textStr + '\n}'
