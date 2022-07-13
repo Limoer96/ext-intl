@@ -1,10 +1,10 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as chalk from 'chalk'
-import { Text } from '../transformer/transformChinese'
-import { useTs } from '../constant'
-import { ExtConfig } from '../interface'
-import { formatFileWithConfig } from './format'
+import { Text } from '../../transformer/transformChinese'
+import { useTs } from '../../constant'
+import { formatFileWithConfig } from '../../utils/format'
+import { ExtConfig } from '../config/interface'
 
 function getText(textObj: Text, lang: string) {
   const config = <ExtConfig>global['intlConfig']

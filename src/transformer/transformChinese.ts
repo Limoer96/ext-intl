@@ -1,6 +1,7 @@
 import * as ts from 'typescript'
+import { ExtConfig } from '../commands/config/interface'
 import { DOUBLE_BYTE_REGEX } from '../constant'
-import { ExtConfig, OriginEntryItem } from '../interface'
+import { OriginEntryItem } from '../interface'
 import { removeFileComment, saveFile, getVariableFromTmeplateString, getQuotePath } from '../utils/common'
 export interface Text {
   key: string

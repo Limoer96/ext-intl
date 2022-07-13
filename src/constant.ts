@@ -1,17 +1,4 @@
-import { ExtCustomConfig } from './interface'
 import { resolvePath, useTs as useTsFn } from './utils/common'
-
-export const INIT_CONFIG: ExtCustomConfig = {
-  rootPath: resolvePath('./src'),
-  langs: ['zh-CN', 'en-US'],
-  extractOnly: true,
-  whiteList: ['.ts', '.tsx', '.js', '.jsx'],
-  prefix: [],
-  templateString: {
-    funcName: 'I18N.get',
-  },
-  fieldPrefix: 'intl',
-}
 
 export const TAB = ' '
 export const DOUBLE_BYTE_REGEX: RegExp = /[^\x00-\xff]/g

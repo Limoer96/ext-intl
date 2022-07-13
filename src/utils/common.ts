@@ -24,19 +24,6 @@ export function removeFileComment(code: string, fileName: string) {
 }
 
 /**
- * 大写首字母，如果其索引不为0的话
- * @param str
- * @param idx
- * @returns
- */
-function upperCase(str: string, idx: number) {
-  if (idx === 0) {
-    return str
-  } else {
-    return str.charAt(0).toUpperCase() + str.slice(1)
-  }
-}
-/**
  * 按分割符'/'返回解析后的路径列表
  * @param fileRelativePath
  * @returns
@@ -84,21 +71,6 @@ export function saveFile(ast: ts.SourceFile, fileName: string, prefix?: string[]
   } catch (error) {
     console.log(chalk.red(`[ERROR] 无法生成文件，请手动替换: ${fileName}`))
   }
-}
-
-/**
- * 处理匹配到的原始词条
- * @param text 原始词条
- * @param template 是否生成模板
- */
-export function measureText(text: string, template: boolean) {
-  if (template) return ''
-  const res = text
-    .replace(/;/g, '')
-    .replace(/[\r\n]/g, '')
-    .replace(/\$/g, '')
-    .replace(/[`'"]/g, '')
-  return res
 }
 
 /**

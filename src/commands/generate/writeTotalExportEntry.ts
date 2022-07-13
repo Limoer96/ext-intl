@@ -1,9 +1,9 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as chalk from 'chalk'
-import { ExtConfig } from '../interface'
-import { useTs } from '../constant'
-import { formatFileWithConfig } from './format'
+import { useTs } from '../../constant'
+import { formatFileWithConfig } from '../../utils/format'
+import { ExtConfig } from '../config/interface'
 
 function getExportContentByLang(lang: string, files: string[]) {
   const list = ['{']

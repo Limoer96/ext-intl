@@ -1,10 +1,10 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as chalk from 'chalk'
-import { ExtConfig } from '../interface'
-import { formatFileName } from './common'
-import { useTs } from '../constant'
-import { formatFileWithConfig } from './format'
+import { formatFileName } from '../../utils/common'
+import { useTs } from '../../constant'
+import { formatFileWithConfig } from '../../utils/format'
+import { ExtConfig } from '../config/interface'
 
 /**
  * 给每个文件夹写入一个导出入口`index.js/ts`

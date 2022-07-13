@@ -1,10 +1,7 @@
 #!/usr/bin/env node
 const { Command } = require('commander')
-const { intl } = require('./dist/index')
+const { sync, start, update } = require('./dist/index')
 const { generateConfigFile, readConfigFile, getMergedConfig, checkConfig } = require('./dist/commands/config')
-const { sync } = require('./dist/commands/sync')
-const { start } = require('./dist/commands/generate')
-const { update } = require('./dist/commands/update')
 
 const program = new Command()
 

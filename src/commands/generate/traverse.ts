@@ -1,9 +1,9 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { IGNORE_I18N_PATH } from '../../constant'
-import { transformChinese } from '../../transformer/transformChinese'
-import writeOutputFile from '../../utils/writeOutputFile'
-import writeDirExportEntry from '../../utils/writeDirExportEntry'
+import { Text, transformChinese } from '../../transformer/transformChinese'
+import writeOutputFile from './writeOutputFile'
+import writeDirExportEntry from './writeDirExportEntry'
 import { ExtConfig } from '../config/interface'
 
 /**
@@ -11,7 +11,7 @@ import { ExtConfig } from '../config/interface'
  * @export
  * @param {string} pathName 当前遍历路径
  */
-export function traverseDir(pathName: string) {
+export function traverseDir(pathName: string, getUnMatchedEntries?: (entries: Text[]) => void) {
   const { whiteList } = <ExtConfig>global['intlConfig']
   if (fs.statSync(pathName).isFile()) {
     // 单个文件
@@ -20,6 +20,7 @@ export function traverseDir(pathName: string) {
     }
     const text = fs.readFileSync(pathName).toString()
     const result = transformChinese(text, pathName)
+    getUnMatchedEntries(result.filter((item) => !item.isMatch))
     writeOutputFile(result, pathName)
   } else {
     // 文件夹
@@ -27,7 +28,7 @@ export function traverseDir(pathName: string) {
     files.forEach((file) => {
       const absPath = path.resolve(pathName, file)
       if (absPath !== IGNORE_I18N_PATH) {
-        traverseDir(absPath)
+        traverseDir(absPath, getUnMatchedEntries)
       }
     })
     // 针对文件夹写入入口文件
