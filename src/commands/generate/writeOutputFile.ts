@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as chalk from 'chalk'
 import { Text } from '../../transformer/transformChinese'
-import { useTs } from '../../constant'
+import { isUseTs } from '../../utils/common'
 import { formatFileWithConfig } from '../../utils/format'
 import { ExtConfig } from '../config/interface'
 
@@ -40,7 +40,7 @@ function writeOutputFile(textArr: Text[], targetFilePath: string, lang: string) 
   if (!exist) {
     fs.mkdirSync(dirname, { recursive: true })
   }
-  const extName = useTs ? '.ts' : '.js'
+  const extName = isUseTs ? '.ts' : '.js'
   const fileName = targetFilePath.replace(path.parse(targetFilePath).ext, extName)
   try {
     write(fileName, textStr)

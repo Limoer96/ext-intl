@@ -4,11 +4,12 @@ const {
   sync,
   start,
   update,
+  getMergedConfig,
   generateConfigFile,
   readConfigFile,
-  getMergedConfig,
   checkConfig,
 } = require('./dist/index')
+
 const program = new Command()
 
 program.name('ext-intl').description('多语言脚本').version('3.0.0')

@@ -77,7 +77,7 @@ export async function writeConfigFile() {
  * 3. 如果本地配置文件不存在，则会询问是否使用默认配置生成配置文件
  * 4. 读取读取传入config或者配置文件config，合并后返回
  */
-export async function checkConfig(config: ExtCustomConfig) {
+export async function checkConfig(config?: ExtCustomConfig) {
   const mergedConfig = getMergedConfig(config)
   if (mergedConfig) {
     return mergedConfig

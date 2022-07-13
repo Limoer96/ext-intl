@@ -216,3 +216,7 @@ export function removeDuplicatedText(textSet: Text[], list: Text[]) {
   }
   return result
 }
+
+export const IGNORE_I18N_PATH = resolvePath('./src/i18n')
+
+export const isUseTs = useTs()

@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { IGNORE_I18N_PATH } from '../../constant'
+import { IGNORE_I18N_PATH } from '../../utils/common'
 import { Text, transformChinese } from '../../transformer/transformChinese'
 import writeOutputFile from './writeOutputFile'
 import writeDirExportEntry from './writeDirExportEntry'

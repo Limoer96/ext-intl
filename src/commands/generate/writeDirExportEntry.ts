@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as chalk from 'chalk'
 import { formatFileName } from '../../utils/common'
-import { useTs } from '../../constant'
+import { isUseTs } from '../../utils/common'
 import { formatFileWithConfig } from '../../utils/format'
 import { ExtConfig } from '../config/interface'
 
@@ -13,7 +13,7 @@ import { ExtConfig } from '../config/interface'
 
 function writeDirExportEntry(dirPath: string) {
   const { whiteList, outputPath, langs, versionName, rootPath } = <ExtConfig>global['intlConfig']
-  const extname = '.' + (useTs ? 'ts' : 'js')
+  const extname = '.' + (isUseTs ? 'ts' : 'js')
   // 处理文件路径
   for (const lang of langs) {
     let filePath = dirPath

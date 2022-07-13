@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { useTs } from '../../utils/common'
+import { isUseTs } from '../../utils/common'
 import { updateLangFile } from './updateLangFile'
 import * as ts from 'typescript'
 import { formatFileWithConfig } from '../../utils/format'
@@ -12,7 +12,7 @@ import { formatFileWithConfig } from '../../utils/format'
  */
 export function traverseDir(file: string, pathName: string, langType: string) {
   if (fs.statSync(pathName).isFile()) {
-    if (file === `index.${useTs() ? 'ts' : 'js'}`) {
+    if (file === `index.${isUseTs ? 'ts' : 'js'}`) {
       const text = fs.readFileSync(pathName).toString()
       const ast = ts.createSourceFile('', text, ts.ScriptTarget.ES2015, true, ts.ScriptKind.TS)
       let result = updateLangFile(ast, langType)

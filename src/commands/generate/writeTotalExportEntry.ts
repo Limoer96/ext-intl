@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as chalk from 'chalk'
-import { useTs } from '../../constant'
+import { isUseTs } from '../../utils/common'
 import { formatFileWithConfig } from '../../utils/format'
 import { ExtConfig } from '../config/interface'
 
@@ -20,7 +20,7 @@ function getExportContentByLang(lang: string, files: string[]) {
 function writeTotalExportEntry() {
   const { langs, outputPath } = <ExtConfig>global['intlConfig']
   const basePath = `${outputPath}/langs`
-  const extname = '.' + (useTs ? 'ts' : 'js')
+  const extname = '.' + (isUseTs ? 'ts' : 'js')
   let content = ''
   try {
     const files = fs
