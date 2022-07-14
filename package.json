@@ -4,7 +4,7 @@
   "description": "一个可以提取中文词条和并注入词条名到源文件名的工具",
   "main": "dist/index.js",
   "scripts": {
-    "compile": "tsc src/index.ts --outDir dist/ --declaration",
+    "compile": "tsc",
     "build": "rollup -c"
   },
   "files": [

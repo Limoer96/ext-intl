@@ -1,13 +1,15 @@
 {
   "compilerOptions": {
-    "module": "ES6",
-    "target": "ESNext",
+    "module": "CommonJS",
+    "target": "ES2017",
     "outDir": "dist",
-    "declaration": true,
     "lib": ["es6", "es2016.array.include"],
     "skipLibCheck": true,
-    "sourceMap": true,
-    "rootDir": "src"
+    "rootDir": "src",
+    "declaration": true,
+    "sourceMap": false,
+    "declarationMap": false,
+    "moduleResolution": "Node"
   },
   "exclude": ["node_modules", ".vscode-test", "dist"]
 }
