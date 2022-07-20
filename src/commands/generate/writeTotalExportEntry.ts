@@ -8,10 +8,29 @@ import { ExtConfig } from '../config/interface'
 function getExportContentByLang(lang: string, files: string[]) {
   const list = ['{']
   for (const file of files) {
-    list.push(`'${file}': ${file}_${lang},`)
+    list.push(`'${file}': ${file}_${getLangCountryCode(lang)},`)
   }
   list.push('}')
   return list.join('')
+}
+
+/**
+ * 获取语言国家码
+ * @param lang
+ * @returns
+ */
+function getLangCountryCode(lang: string) {
+  const splited = lang.split('-')
+  return splited[1]
+}
+
+/**
+ * 获取语言的JS变量名
+ * @param lang
+ * @returns
+ */
+function getLangJSProperty(lang: string) {
+  return lang.replace('-', '')
 }
 
 /**
@@ -28,11 +47,11 @@ function writeTotalExportEntry() {
       .filter((file) => fs.statSync(`${basePath}/${file}`).isDirectory() && file.includes('v'))
     for (const file of files) {
       for (const lang of langs) {
-        content += `import ${file}_${lang} from './${file}/${lang}/_index';`
+        content += `import ${file}_${getLangCountryCode(lang)} from './${file}/${lang}/_index';`
       }
     }
     for (const lang of langs) {
-      content += `export const ${lang} = ${getExportContentByLang(lang, files)};`
+      content += `export const ${getLangJSProperty(lang)} = ${getExportContentByLang(lang, files)};`
     }
   } catch (error) {}
   content = formatFileWithConfig(content)

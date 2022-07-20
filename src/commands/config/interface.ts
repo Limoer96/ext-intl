@@ -24,6 +24,10 @@ export interface ExtConfig {
    * 用户访问权限
    */
   accessKey?: string
+  /**
+   * 语言映射（key作为当前多语言脚本语言，value作词库平台支持语言）
+   */
+  langMapper?: Record<string, string>
 }
 
 export interface ExtCustomConfig extends Omit<ExtConfig, 'outputPath' | 'versionName'> {}

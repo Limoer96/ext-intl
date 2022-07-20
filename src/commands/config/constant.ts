@@ -13,6 +13,10 @@ export const INIT_CONFIG: ExtCustomConfig = {
   fieldPrefix: 'intl',
   origin: '',
   accessKey: '',
+  langMapper: {
+    'zh-CN': 'zh-CN',
+    'en-US': 'en-US',
+  },
 }
 
 export const CONFIG_FILE_NAME = '.extintl.json'

@@ -14,15 +14,17 @@ export async function start(config: ExtConfig) {
     global['intlConfig'] = config
     const entries = await readEntryFile()
     global['local_entries'] = entries
-    const { outputPath, versionName, langs, rootPath, origin, accessKey } = config
+    const { outputPath, versionName, langs, rootPath, origin, accessKey, extractOnly } = config
     console.log('[INFO] 开始提取...')
     console.time('[INFO] 提取用时')
     const unMatchedList: Text[] = []
     // 1. 创建多语言根目录&此次提取的词条目录
     try {
       await mkRootDirIfNeeded()
-      for (const lang of langs) {
-        await fs.mkdir(`${outputPath}/langs/${versionName}/${lang}`, { recursive: true })
+      if (!extractOnly) {
+        for (const lang of langs) {
+          await fs.mkdir(`${outputPath}/langs/${versionName}/${lang}`, { recursive: true })
+        }
       }
     } catch (error) {
       const code = error.code
@@ -34,8 +36,10 @@ export async function start(config: ExtConfig) {
     traverseDir(rootPath, (entries) => {
       unMatchedList.push(...removeDuplicatedText(unMatchedList, entries))
     })
-    // 3. 写入词条入口文件
-    writeTotalExportEntry()
+    if (!extractOnly) {
+      // 3. 写入词条入口文件
+      writeTotalExportEntry()
+    }
     // 4. 如果是非提取模式，写入基于kiwi-intl的模版文件
     if (!config.extractOnly) {
       writeI18nTemplateFile()

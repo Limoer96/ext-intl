@@ -12,7 +12,7 @@ import { ExtConfig } from '../config/interface'
  * @param {string} pathName 当前遍历路径
  */
 export function traverseDir(pathName: string, getUnMatchedEntries?: (entries: Text[]) => void) {
-  const { whiteList } = <ExtConfig>global['intlConfig']
+  const { whiteList, extractOnly } = <ExtConfig>global['intlConfig']
   if (fs.statSync(pathName).isFile()) {
     // 单个文件
     if (!whiteList.includes(path.extname(pathName))) {
@@ -21,7 +21,10 @@ export function traverseDir(pathName: string, getUnMatchedEntries?: (entries: Te
     const text = fs.readFileSync(pathName).toString()
     const result = transformChinese(text, pathName)
     getUnMatchedEntries(result.filter((item) => !item.isMatch))
-    writeOutputFile(result, pathName)
+    // 只有非提取模式下才生成词条文件
+    if (!extractOnly) {
+      writeOutputFile(result, pathName)
+    }
   } else {
     // 文件夹
     const files = fs.readdirSync(pathName)
@@ -31,7 +34,9 @@ export function traverseDir(pathName: string, getUnMatchedEntries?: (entries: Te
         traverseDir(absPath, getUnMatchedEntries)
       }
     })
-    // 针对文件夹写入入口文件
-    writeDirExportEntry(pathName)
+    if (!extractOnly) {
+      // 针对文件夹写入入口文件
+      writeDirExportEntry(pathName)
+    }
   }
 }

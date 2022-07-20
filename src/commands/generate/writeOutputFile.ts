@@ -7,9 +7,10 @@ import { formatFileWithConfig } from '../../utils/format'
 import { ExtConfig } from '../config/interface'
 
 function getText(textObj: Text, lang: string) {
-  const config = <ExtConfig>global['intlConfig']
-  const isMainLang = lang === config.langs[0]
-  const text = isMainLang ? textObj.value : textObj[lang] || ''
+  const { langMapper, langs } = <ExtConfig>global['intlConfig']
+  const isMainLang = lang === langs[0]
+  const langKey = langMapper[lang] || lang
+  const text = isMainLang ? textObj.value : textObj[langKey] || ''
   return text
     .replace(/;/g, '')
     .replace(/[\r\n]/g, '')

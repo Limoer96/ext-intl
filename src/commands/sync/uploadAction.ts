@@ -10,8 +10,9 @@ interface UploadActionConfig extends Omit<UploadConfig, 'entries'> {
 }
 
 export async function uploadAction(config: UploadActionConfig) {
-  const intlConfig = <ExtConfig>global['intlConfig']
-  const mainLang = intlConfig['langs'][0]
+  const { langs, langMapper } = <ExtConfig>global['intlConfig']
+  const mainLang = langs[0]
+  const langKey = langMapper[mainLang] || mainLang
   if (config.unMatchedList && config.unMatchedList.length > 0) {
     const answer = await inquirer.prompt([
       {
@@ -23,7 +24,7 @@ export async function uploadAction(config: UploadActionConfig) {
     if (answer.shouldUpload) {
       const entries: UploadEntryItem[] = config.unMatchedList.map((item) => ({
         langs: {
-          [mainLang]: item.value,
+          [langKey]: item.value,
         },
       }))
       await upload({ origin: config.origin, accessKey: config.accessKey, entries })
