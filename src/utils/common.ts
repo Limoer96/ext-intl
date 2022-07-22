@@ -217,6 +217,20 @@ export function removeDuplicatedText(textSet: Text[], list: Text[]) {
   return result
 }
 
+/**
+ * 单个列表的词条数据去重复
+ * @param list
+ */
+export function removeDuplicatedTextList(list: Text[]) {
+  const result: Text[] = []
+  for (const item of list) {
+    if (!result.find((one) => one.value === item.value)) {
+      result.push(item)
+    }
+  }
+  return result
+}
+
 export const IGNORE_I18N_PATH = resolvePath('./src/i18n')
 
 export const isUseTs = useTs()

@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { IGNORE_I18N_PATH } from '../../utils/common'
+import { IGNORE_I18N_PATH, removeDuplicatedTextList } from '../../utils/common'
 import { Text, transformChinese } from '../../transformer/transformChinese'
 import writeOutputFile from './writeOutputFile'
 import writeDirExportEntry from './writeDirExportEntry'
@@ -23,7 +23,7 @@ export function traverseDir(pathName: string, getUnMatchedEntries?: (entries: Te
     getUnMatchedEntries(result.filter((item) => !item.isMatch))
     // 只有非提取模式下才生成词条文件
     if (!extractOnly) {
-      writeOutputFile(result, pathName)
+      writeOutputFile(removeDuplicatedTextList(result), pathName)
     }
   } else {
     // 文件夹
