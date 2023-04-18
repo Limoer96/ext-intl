@@ -3,6 +3,7 @@ export interface ExtConfig {
   rootPath: string
   extractOnly: boolean
   whiteList: string[]
+  uploadFilePath: string
   prefix?: string[]
   templateString?: {
     funcName: string

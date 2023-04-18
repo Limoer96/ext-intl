@@ -8,6 +8,7 @@ const {
   generateConfigFile,
   readConfigFile,
   checkConfig,
+  upload,
 } = require('./dist/index')
 
 const program = new Command()
@@ -45,6 +46,15 @@ program
   .option('-o, --override', '覆盖当前已经存在的配置')
   .action(async (options) => {
     await generateConfigFile(options.override)
+  })
+
+program
+  .command('upload')
+  .description('上传本地词条至远程词库')
+  .option('-c, --cover', '覆盖远程词库已经存在的词条', false)
+  .action(async (options) => {
+    const config = await checkConfig()
+    await upload(config, options.cover)
   })
 
 program.parse()

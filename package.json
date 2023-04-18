@@ -22,11 +22,14 @@
     "graphql-request": "^4.3.0",
     "inquirer": "^8.2.2",
     "kiwi-intl": "^1.2.4",
+    "lodash": "^4.17.21",
+    "pinyin": "^3.0.0-alpha.5",
     "prettier": "^2.6.1",
     "typescript": "^4.6.3"
   },
   "devDependencies": {
     "@types/inquirer": "^8.2.0",
+    "@types/lodash": "^4.14.194",
     "@types/node": "^17.0.23",
     "@types/prettier": "^2.4.4",
     "rollup": "^1.27.2",

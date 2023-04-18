@@ -1,0 +1,30 @@
+{
+  "rootPath": "/Users/tt/project/ext-intl/src/i18n/langs",
+  "langs": [
+    "zh-CN",
+    "en-US",
+    "vi-VN",
+    "th-TH"
+  ],
+  "extractOnly": true,
+  "whiteList": [
+    ".ts",
+    ".tsx",
+    ".js",
+    ".jsx"
+  ],
+  "prefix": [],
+  "uploadFilePath": "/Users/tt/project/ext-intl/src/i18n/langs",
+  "templateString": {
+    "funcName": "I18N.get"
+  },
+  "fieldPrefix": "intl",
+  "origin": "",
+  "accessKey": "",
+  "langMapper": {
+    "zh-CN": "zh",
+    "en-US": "en",
+    "th-TH": "th",
+    "vi-VN": "vie"
+  }
+}

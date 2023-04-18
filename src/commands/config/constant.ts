@@ -7,6 +7,7 @@ export const INIT_CONFIG: ExtCustomConfig = {
   extractOnly: true,
   whiteList: ['.ts', '.tsx', '.js', '.jsx'],
   prefix: [],
+  uploadFilePath: '',
   templateString: {
     funcName: 'I18N.get',
   },
