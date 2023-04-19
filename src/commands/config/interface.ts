@@ -8,6 +8,7 @@ export interface ExtConfig {
   templateString?: {
     funcName: string
   }
+  appId: number
   langs?: string[]
   /**
    * 字段命名前缀

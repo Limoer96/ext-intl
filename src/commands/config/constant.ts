@@ -6,6 +6,7 @@ export const INIT_CONFIG: ExtCustomConfig = {
   langs: ['zh-CN', 'en-US'],
   extractOnly: true,
   whiteList: ['.ts', '.tsx', '.js', '.jsx'],
+  appId: 1,
   prefix: [],
   uploadFilePath: '',
   templateString: {

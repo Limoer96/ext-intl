@@ -18,6 +18,7 @@
   "templateString": {
     "funcName": "I18N.get"
   },
+  "appId": 1,
   "fieldPrefix": "intl",
   "origin": "",
   "accessKey": "",

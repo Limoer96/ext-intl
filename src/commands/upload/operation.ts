@@ -163,8 +163,9 @@ export function getSingleEntry(entryObj: Object, keyPath: string[], lang: string
  * @param {boolean} isCover 是否覆盖远程词库已经存在的词条
  */
 export async function uploadEntryRequest(entryInfo: UploadEntryType[], isCover: boolean) {
+  const { appId } = <ExtConfig>global['intlConfig']
   const res = await request('http://localhost:3000/graphql', uploadGql, {
-    appId: 5,
+    appId,
     entries: entryInfo,
     isCover,
   })
