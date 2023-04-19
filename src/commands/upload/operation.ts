@@ -124,9 +124,9 @@ export function formateEntryInfo(entryObj: Object) {
         style: 'tone2',
       })
       const pinYinStr = flatten(pinYinArr).join('_')
-      if (formattedEntryInfo.findIndex((item) => item.key === pinYinStr) === -1) {
+      if (formattedEntryInfo.findIndex((item) => item.key === pinYinStr || item.mainLangText === mainLangText) === -1) {
         formattedEntryInfo.push({
-          key: pinYinStr,
+          key: pinYinStr.length > 20 ? '' : pinYinStr,
           langs: newLangs,
           mainLang: langMapper[langs[0]],
           mainLangText: mainLangText,
