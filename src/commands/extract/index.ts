@@ -14,7 +14,8 @@ export async function extract(config: ExtConfig, cover: boolean = false, path: s
 
       console.time('上传用时')
       const res = await extractEntryRequest(uploadPayload, cover)
-      if (res.uploadLocalEntries) {
+
+      if (res.extractLocalEntries) {
         console.timeEnd('上传用时')
         console.log('上传成功')
       }

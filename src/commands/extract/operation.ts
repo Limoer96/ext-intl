@@ -3,10 +3,10 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as ts from 'typescript'
 import { ExtConfig } from '../config/interface'
-import { flatten, get, isEmpty } from 'lodash'
 import { UploadEntryType } from './types'
 import pinyin from 'pinyin'
 import { request, gql } from 'graphql-request'
+import { flatten, get, isEmptyObject } from './utils'
 
 const extractGql = gql`
   mutation ExtractLocalEntries($accessKey: String!, $entries: [ExtractLocalEntryItem]!, $isCover: Boolean) {
@@ -38,7 +38,7 @@ export async function readMultipleLanguageEntry(pathName: string) {
     for (let index = 0; index < files.length; index++) {
       const absPath = path.resolve(pathName, files[index])
       const entryObj = await readMultipleLanguageEntry(absPath)
-      if (!isEmpty(entryObj)) {
+      if (!isEmptyObject(entryObj)) {
         obj[files[index]] = entryObj
       }
     }
