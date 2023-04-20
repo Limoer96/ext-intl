@@ -6,9 +6,7 @@ export const INIT_CONFIG: ExtCustomConfig = {
   langs: ['zh-CN', 'en-US'],
   extractOnly: true,
   whiteList: ['.ts', '.tsx', '.js', '.jsx'],
-  appId: 1,
   prefix: [],
-  uploadFilePath: '',
   templateString: {
     funcName: 'I18N.get',
   },
@@ -16,8 +14,8 @@ export const INIT_CONFIG: ExtCustomConfig = {
   origin: '',
   accessKey: '',
   langMapper: {
-    'zh-CN': 'zh-CN',
-    'en-US': 'en-US',
+    'zh-CN': 'zh',
+    'en-US': 'en',
   },
 }
 

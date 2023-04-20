@@ -8,9 +8,9 @@ import { UploadEntryType } from './types'
 import pinyin from 'pinyin'
 import { request, gql } from 'graphql-request'
 
-const uploadGql = gql`
-  mutation Mutation($appId: Int!, $entries: [UploadLocalEntryItem]!, $isCover: Boolean) {
-    uploadLocalEntries(appId: $appId, entries: $entries, isCover: $isCover)
+const extractGql = gql`
+  mutation ExtractLocalEntries($accessKey: String!, $entries: [ExtractLocalEntryItem]!, $isCover: Boolean) {
+    extractLocalEntries(accessKey: $accessKey, entries: $entries, isCover: $isCover)
   }
 `
 
@@ -120,13 +120,17 @@ export function formateEntryInfo(entryObj: Object) {
         }
       }, {})
       const mainLangText = newLangs[langMapper[langs[0]]]
-      const pinYinArr = pinyin(mainLangText, {
+      const noCharText = mainLangText.replace(
+        /[\u0021-\u007E\u00A1-\u00FF\u3001-\u301f\uff01-\uff0f\uff1a-\uff20\uff3b-\uff40\uff5b-\uff65]/g,
+        ''
+      )
+      const pinYinArr = pinyin(noCharText, {
         style: 'tone2',
       })
       const pinYinStr = flatten(pinYinArr).join('_')
       if (formattedEntryInfo.findIndex((item) => item.key === pinYinStr || item.mainLangText === mainLangText) === -1) {
         formattedEntryInfo.push({
-          key: pinYinStr.length > 20 ? '' : pinYinStr,
+          key: pinYinStr.length > 40 ? '' : pinYinStr,
           langs: newLangs,
           mainLang: langMapper[langs[0]],
           mainLangText: mainLangText,
@@ -157,15 +161,15 @@ export function getSingleEntry(entryObj: Object, keyPath: string[], lang: string
 }
 
 /**
- * 获取单个词条的详细信息
+ * 提取词条到远程词库
  * @export
  * @param {UploadEntryType[]} entryInfo 上传的词条信息
  * @param {boolean} isCover 是否覆盖远程词库已经存在的词条
  */
-export async function uploadEntryRequest(entryInfo: UploadEntryType[], isCover: boolean) {
-  const { appId } = <ExtConfig>global['intlConfig']
-  const res = await request('http://localhost:3000/graphql', uploadGql, {
-    appId,
+export async function extractEntryRequest(entryInfo: UploadEntryType[], isCover: boolean) {
+  const { origin, accessKey } = <ExtConfig>global['intlConfig']
+  const res = await request(origin, extractGql, {
+    accessKey,
     entries: entryInfo,
     isCover,
   })

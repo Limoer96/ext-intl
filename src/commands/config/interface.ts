@@ -3,12 +3,10 @@ export interface ExtConfig {
   rootPath: string
   extractOnly: boolean
   whiteList: string[]
-  uploadFilePath: string
   prefix?: string[]
   templateString?: {
     funcName: string
   }
-  appId: number
   langs?: string[]
   /**
    * 字段命名前缀

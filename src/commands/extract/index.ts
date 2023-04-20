@@ -1,20 +1,19 @@
 import * as chalk from 'chalk'
 import { ExtConfig } from '../config/interface'
-import { formateEntryInfo, readMultipleLanguageEntry, uploadEntryRequest } from './operation'
+import { formateEntryInfo, readMultipleLanguageEntry, extractEntryRequest } from './operation'
 
-export async function upload(config: ExtConfig, cover: boolean = false) {
+export async function extract(config: ExtConfig, cover: boolean = false, path: string) {
   try {
     global['intlConfig'] = config
-    const { uploadFilePath } = config
     // 1. 读取项目中已有的多语言
     try {
       console.time('读取用时')
-      const entryInfo = await readMultipleLanguageEntry(uploadFilePath)
+      const entryInfo = await readMultipleLanguageEntry(path)
       console.timeEnd('读取用时')
       const uploadPayload = formateEntryInfo(entryInfo)
 
       console.time('上传用时')
-      const res = await uploadEntryRequest(uploadPayload, cover)
+      const res = await extractEntryRequest(uploadPayload, cover)
       if (res.uploadLocalEntries) {
         console.timeEnd('上传用时')
         console.log('上传成功')
