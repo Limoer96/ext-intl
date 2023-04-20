@@ -14,8 +14,8 @@ export const INIT_CONFIG: ExtCustomConfig = {
   origin: '',
   accessKey: '',
   langMapper: {
-    'zh-CN': 'zh-CN',
-    'en-US': 'en-US',
+    'zh-CN': 'zh',
+    'en-US': 'en',
   },
 }
 

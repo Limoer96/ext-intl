@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const { Command } = require('commander')
+const path = require('path')
 const {
   sync,
   start,
@@ -8,6 +9,7 @@ const {
   generateConfigFile,
   readConfigFile,
   checkConfig,
+  extract,
 } = require('./dist/index')
 
 const program = new Command()
@@ -45,6 +47,16 @@ program
   .option('-o, --override', '覆盖当前已经存在的配置')
   .action(async (options) => {
     await generateConfigFile(options.override)
+  })
+
+program
+  .command('extract')
+  .description('上传本地词条至远程词库')
+  .option('-c, --cover', '覆盖远程词库已经存在的词条', false)
+  .option('-p, --path', "要上传词条的文件的绝对路径", path.resolve(process.cwd(), './src/i18n/langs'))
+  .action(async (options) => {
+    const config = await checkConfig()
+    await extract(config, options.cover, options.path)
   })
 
 program.parse()
