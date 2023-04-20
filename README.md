@@ -33,6 +33,7 @@ const {
   generateConfigFile,
   readConfigFile,
   checkConfig,
+  extract
 } = require('ext-intl')
 const config = {...}
 // 生成配置文件
@@ -50,6 +51,8 @@ sync(config.origin, config.accessKey)
 start(config)
 // 进行一次本次词条更新
 update(config.langs[0])
+// 提取本地词条，上传至词条库
+extract(config,false,'')
 ```
 
 3. 项目根目录下运行`node xx.js`
@@ -67,7 +70,8 @@ update(config.langs[0])
       "intl:config": "extintl config -o",
       "intl:sync": "extintl sync",
       "intl:start": "extintl start",
-      "intl:update": "extintl update"
+      "intl:update": "extintl update",
+      "intl:extract": "extintl extract"
     }
   }
 ```
@@ -97,6 +101,15 @@ function start(config: ExtConfig): Promise<void>;
  * @param mainLangType 多语言环境下的主要语言（不需要翻译）
  */
 function update(mainLangType: string): Promise<void>;
+
+/**
+ * 提取本地词条上传至词条库
+ * @param config 配置
+ * @param cover 是否覆盖远程词库已经存在的词条
+ * @param path 要提取的词条的绝对路径
+ * @returns
+ */
+function extract(config:ExtConfig, cover:boolean, path:string):Promise<void>
 
 /**
  * 检查配置的流程：
@@ -141,8 +154,8 @@ export const DEFAULT_CONFIG: IConfig = {
   origin: '',
   accessKey: '',
   langMapper: {
-    'zh-CN': 'zh-CN',
-    'en-US': 'en-US',
+    'zh-CN': 'zh',
+    'en-US': 'en',
   },
 }
 ```
