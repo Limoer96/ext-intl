@@ -11,13 +11,20 @@ export function flatten(array: Array<any>, dep: number = 1): Array<any> {
   }, [])
 }
 
+type ObjectType = {
+  [key: string]: any
+}
+
 /**
  * 判断是否是空对象
  * @export
  * @param {Object} object 对象
  */
-export function isEmptyObject(object: Object): boolean {
-  return Object.keys(object).length === 0
+export function isEmptyObject(object: ObjectType): boolean {
+  if (Object.prototype.toString.call(object) === '[object Object]') {
+    return Object.keys(object).length === 0
+  }
+  return true
 }
 
 /**
@@ -26,10 +33,16 @@ export function isEmptyObject(object: Object): boolean {
  * @param {Object} object 查找的对象
  * @param {Array} path 路径
  */
-export function get(object: Object, path: Array<string>): Object {
+export function get(object: ObjectType, path: Array<string>): Object {
   let result = object
   for (let index = 0; index < path.length; index++) {
-    result = result[path[index]]
+    const value = result[path[index]]
+    if (value) {
+      result = value
+    } else {
+      result = undefined
+      break
+    }
   }
   return result
 }
