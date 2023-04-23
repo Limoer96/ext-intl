@@ -14,7 +14,7 @@ const {
 
 const program = new Command()
 
-program.name('ext-intl').description('多语言脚本').version('3.0.0')
+program.name('ext-intl').description('多语言脚本').version('3.2.0')
 
 program
   .command('sync')
@@ -53,7 +53,7 @@ program
   .command('extract')
   .description('上传本地词条至远程词库')
   .option('-c, --cover', '覆盖远程词库已经存在的词条', false)
-  .option('-p, --path', "要上传词条的文件的绝对路径", path.resolve(process.cwd(), './src/i18n/langs'))
+  .option('-p, --path', '要上传词条的文件的绝对路径', path.resolve(process.cwd(), './src/i18n/langs'))
   .action(async (options) => {
     const config = await checkConfig()
     await extract(config, options.cover, options.path)
