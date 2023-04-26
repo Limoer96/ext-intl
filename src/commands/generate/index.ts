@@ -9,7 +9,7 @@ import { readEntryFile } from '../../utils/readEntryFile'
 import { Text } from '../../transformer/transformChinese'
 import { uploadAction } from '../sync/uploadAction'
 
-export async function start(config: ExtConfig) {
+export async function start(config: ExtConfig, envCarrier: 'WEB' | 'APP') {
   try {
     global['intlConfig'] = config
     const entries = await readEntryFile()
@@ -42,7 +42,7 @@ export async function start(config: ExtConfig) {
     }
     // 4. 如果是非提取模式，写入基于kiwi-intl的模版文件
     if (!config.extractOnly) {
-      writeI18nTemplateFile()
+      writeI18nTemplateFile(envCarrier)
     }
     console.timeEnd('[INFO] 提取用时')
     await uploadAction({ origin, accessKey, unMatchedList })

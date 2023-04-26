@@ -1,4 +1,28 @@
-const contextTemplate = `
+function getContextTemplate(isApp: boolean) {
+  const effectArray = []
+  if (isApp) {
+    effectArray.push(`
+      Storage.get(LANG_STORAGE_KEY).then((lang: LangEnum) => {
+      if (lang) {
+        i18n.setLang(lang)
+      } else {
+        Storage.set(LANG_STORAGE_KEY, i18n.currentLang)
+      }
+      forceUpdate({})
+      })
+    `)
+  } else {
+    effectArray.push(`
+      const lang = Storage.getLocalStorage(LANG_STORAGE_KEY)
+      if (lang) {
+        i18n.setLang(lang)
+      } else {
+        Storage.setLocalStorage(LANG_STORAGE_KEY, i18n.currentLang)
+      }
+      forceUpdate({})
+    `)
+  }
+  const contextTemplate = `
 import React, {
   createContext,
   useEffect,
@@ -27,14 +51,7 @@ export const I18NContextWrapper: React.FC = ({ children }) => {
   const [_, forceUpdate] = useState({})
   const i18n = i18nIns.current
   useEffect(() => {
-    Storage.get(LANG_STORAGE_KEY).then((lang: LangEnum) => {
-      if (lang) {
-        i18n.setLang(lang)
-      } else {
-        Storage.set(LANG_STORAGE_KEY, i18n.currentLang)
-      }
-      forceUpdate({})
-    })
+    ${effectArray.join('')}
   }, [])
   function setLang(lang: LangEnum) {
     if (lang === i18n.currentLang) {
@@ -45,6 +62,7 @@ export const I18NContextWrapper: React.FC = ({ children }) => {
     forceUpdate({})
   }
   return (
+    // eslint-disable-next-line react/jsx-no-constructed-context-values
     <I18NContext.Provider value={{ setLangTriggerRender: setLang, I18N: i18n }}>
       {children}
     </I18NContext.Provider>
@@ -54,4 +72,6 @@ export const useI18n = () => {
   return useContext(I18NContext)
 }
 `
-export default contextTemplate
+  return contextTemplate
+}
+export default getContextTemplate

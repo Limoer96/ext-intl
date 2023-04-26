@@ -2,17 +2,22 @@ import * as fs from 'fs'
 import * as chalk from 'chalk'
 import getI18nTemplateString from './i18n'
 import getTypingTemplateString from './typing'
-import contextTemplate from './context'
+import getContextTemplate from './context'
 import { formatFileWithConfig } from '../utils/format'
 import { ExtConfig } from '../commands/config/interface'
+import appStorageTemplate from './app-storage'
+import webStorageTemplate from './web-storage'
 /**
  * 写入i18n模版文件
  */
-function writeI18nTemplateFile() {
+function writeI18nTemplateFile(envCarrier: 'APP' | 'WEB') {
   const { outputPath, langs } = <ExtConfig>global['intlConfig']
+  const isApp = envCarrier === 'APP'
   const i18nStr = getI18nTemplateString(langs)
   const typingStr = getTypingTemplateString(langs)
-  const contextStr = contextTemplate
+  const contextStr = getContextTemplate(isApp)
+  const storageTemplate = isApp ? appStorageTemplate : webStorageTemplate
+  writeFileIfNotExisted(`${outputPath}/storage.ts`, storageTemplate)
   writeFileIfNotExisted(`${outputPath}/index.ts`, i18nStr)
   writeFileIfNotExisted(`${outputPath}/typing.ts`, typingStr)
   writeFileIfNotExisted(`${outputPath}/context.tsx`, contextStr)
