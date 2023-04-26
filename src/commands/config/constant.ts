@@ -20,3 +20,4 @@ export const INIT_CONFIG: ExtCustomConfig = {
 }
 
 export const CONFIG_FILE_NAME = '.extintl.json'
+export const RN_ASYNC_STORAGE = '@react-native-async-storage/async-storage'
