@@ -3,7 +3,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import * as fsPromise from 'fs/promises'
 import * as chalk from 'chalk'
-import { IMPORTED_I18N_HOOKS, INIT_VERSION_NUMBER } from '../constant'
+import { IMPORTED_I18N_HOOKS, INIT_VERSION_NUMBER, USE_I18N_HOOKS } from '../constant'
 import { formatFileWithConfig } from './format'
 import { Text } from '../transformer/transformChinese'
 /**
@@ -57,17 +57,92 @@ export function getQuotePath(rootPath: string, filePath: string, versionName: st
  * @param prefix 前缀字符串
  */
 export function saveFile(ast: ts.SourceFile, fileName: string, prefix?: string[]) {
+  const targetArr = []
+  const factory = ts.factory
   const printer = ts.createPrinter()
-  let file = printer.printFile(ast)
-  // 导入hooks语句
+  const file = printer.printFile(ast)
+  let updateSourceFile = ts.createSourceFile('', file, ts.ScriptTarget.ES2015, true, ts.ScriptKind.TSX)
+
+  function visitReturnStatement(node: ts.Node) {
+    if (node) {
+      switch (node.kind) {
+        case ts.SyntaxKind.JsxElement:
+          return true
+      }
+      return ts.forEachChild(node, visitReturnStatement)
+    }
+  }
+
+  function handleNode(node: ts.Node) {
+    const { body, parent } = <ts.ArrowFunction>node
+    body.forEachChild((childItem) => {
+      if (childItem.kind === ts.SyntaxKind.ReturnStatement) {
+        const isJSX = visitReturnStatement(childItem)
+        if (isJSX && parent.kind !== ts.SyntaxKind.CallExpression) {
+          targetArr.push({ ...childItem })
+          return true
+        }
+      }
+    })
+  }
+
+  function visit(node: ts.Node) {
+    if (node.kind === ts.SyntaxKind.ArrowFunction || node.kind === ts.SyntaxKind.FunctionDeclaration) {
+      handleNode(node)
+    }
+    ts.forEachChild(node, visit)
+  }
+
+  // 导入i18n的hooks语句
   if (!file.includes(IMPORTED_I18N_HOOKS)) {
-    file = IMPORTED_I18N_HOOKS + file
+    const importStatement = factory.createImportDeclaration(
+      undefined,
+      undefined,
+      ts.factory.createImportClause(
+        false,
+        undefined,
+        ts.factory.createNamedImports([
+          ts.factory.createImportSpecifier(false, undefined, ts.factory.createIdentifier('useI18n')),
+        ])
+      ),
+      ts.factory.createStringLiteral('@/i18n/context')
+    )
+    const updatedStatements = [importStatement, ...updateSourceFile.statements]
+    updateSourceFile = factory.updateSourceFile(updateSourceFile, updatedStatements)
   }
-  if (prefix) {
-    file = prefix.join('\n') + '\n' + file
+  // 导入使用i18n的语句
+  if (!file.includes(USE_I18N_HOOKS)) {
+    visit(updateSourceFile)
+    if (targetArr.length) {
+      const i18nHook = factory.createVariableStatement(
+        undefined,
+        factory.createVariableDeclarationList(
+          [
+            factory.createVariableDeclaration(
+              factory.createObjectBindingPattern([
+                factory.createBindingElement(undefined, undefined, factory.createIdentifier('I18N'), undefined),
+              ]),
+              undefined,
+              undefined,
+              factory.createCallExpression(factory.createIdentifier('useI18n'), undefined, [])
+            ),
+          ],
+          ts.NodeFlags.Const
+        )
+      )
+      targetArr.forEach((item) => {
+        item.parent.statements = factory.createNodeArray([i18nHook, ...item.parent.statements])
+      })
+    }
   }
+  const updateSourceFileText = printer.printFile(updateSourceFile)
+
+  // if (prefix) {
+  //   file = prefix.join('\n') + '\n' + file
+  // }
+
   try {
-    fs.writeFileSync(fileName, formatFileWithConfig(file))
+    fs.writeFileSync(fileName, formatFileWithConfig(updateSourceFileText))
   } catch (error) {
     console.log(chalk.red(`[ERROR] 无法生成文件，请手动替换: ${fileName}`))
   }
