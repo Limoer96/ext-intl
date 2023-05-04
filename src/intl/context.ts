@@ -1,6 +1,6 @@
-function getContextTemplate(isApp: boolean) {
+function getContextTemplate(isNative: boolean) {
   const effectArray = []
-  if (isApp) {
+  if (isNative) {
     effectArray.push(`
       Storage.get(LANG_STORAGE_KEY).then((lang: LangEnum) => {
       if (lang) {

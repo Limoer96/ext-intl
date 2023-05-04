@@ -27,11 +27,11 @@ program
 program
   .command('start')
   .description('开启一次完整的多语言提取')
-  .option('-e, --env <char>', '运行环境', "WEB")
+  .option('-e, --env <char>', '运行环境', "BROWSER")
   .action(async (options) => {
     const config = await checkConfig()
     await sync(config.origin, config.accessKey)
-    await start(config,options.env)
+    await start(config, options.env)
   })
 program
   .command('update')

@@ -3,15 +3,18 @@ import * as fs from 'fs/promises'
 import { traverseDir } from './traverse'
 import writeI18nTemplateFile from '../../intl'
 import writeTotalExportEntry from './writeTotalExportEntry'
-import { ExtConfig } from '../config/interface'
+import { ExtConfig, OperatingEnvEnum } from '../config/interface'
 import { mkRootDirIfNeeded, removeDuplicatedText } from '../../utils/common'
 import { readEntryFile } from '../../utils/readEntryFile'
 import { Text } from '../../transformer/transformChinese'
 import { uploadAction } from '../sync/uploadAction'
 
-export async function start(config: ExtConfig, envCarrier: 'WEB' | 'APP') {
+export async function start(config: ExtConfig, operatingEnv: OperatingEnvEnum) {
   try {
-    global['intlConfig'] = config
+    global['intlConfig'] = {
+      ...config,
+      operatingEnv,
+    }
     const entries = await readEntryFile()
     global['local_entries'] = entries
     const { outputPath, versionName, langs, rootPath, origin, accessKey, extractOnly } = config
@@ -42,7 +45,7 @@ export async function start(config: ExtConfig, envCarrier: 'WEB' | 'APP') {
     }
     // 4. 如果是非提取模式，写入基于kiwi-intl的模版文件
     if (!config.extractOnly) {
-      writeI18nTemplateFile(envCarrier)
+      await writeI18nTemplateFile()
     }
     console.timeEnd('[INFO] 提取用时')
     await uploadAction({ origin, accessKey, unMatchedList })
