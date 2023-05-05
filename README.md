@@ -129,7 +129,6 @@ function checkConfig(config: ExtCustomConfig): Promise<ExtConfig>;
 | rootPath                           | 源文件或源文件目录                                                                         | `string`   |
 | extractOnly                        | 是否只扫描文件，并不进行替换，如果设置为`false`，则会进行源文件替换，且集成`kiwi-intl`     | `boolean`  |
 | whiteList                          | 文件类型白名单，指定只扫描文件类型，可过滤掉图片/字体等文件的干扰                          | `string[]` |
-| prefix                             | 在替换模式下，需要添加到源文件顶部的内容，一般为导出等                                     | `string[]` |
 | templateString.funcName            | 处理模板字符串时，用于原处替换的函数名称                                                   | `string`   |
 | fieldPrefix                        | 生成字段命名时，使用的前前缀字符串，字段命名规则为{prefix}\_{index}，默认值：`intl`        | `string`   |
 | versionName                        | 当次运行的版本，内部自动维护，请不要手动传入，命名规则 v{index}｜`string`                  |
@@ -146,7 +145,6 @@ export const DEFAULT_CONFIG: IConfig = {
   langs: ['zh-CN', 'en-US'],
   extractOnly: true,
   whiteList: ['.ts', '.tsx', '.js', '.jsx'],
-  prefix: [],
   templateString: {
     funcName: 'kiwiIntl.get',
   },
