@@ -3,7 +3,6 @@ export interface ExtConfig {
   rootPath: string
   extractOnly: boolean
   whiteList: string[]
-  prefix?: string[]
   templateString?: {
     funcName: string
   }

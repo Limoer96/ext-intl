@@ -16,7 +16,7 @@ export interface Text {
  * @param fileName 当前文件路径名
  */
 export function transformChinese(code: string, fileName: string) {
-  const { extractOnly, prefix, templateString, fieldPrefix, versionName, rootPath } = <ExtConfig>global['intlConfig']
+  const { extractOnly, templateString, fieldPrefix, versionName, rootPath } = <ExtConfig>global['intlConfig']
   const entries: OriginEntryItem[] = global['local_entries']
   const matches: Array<Text> = []
   const ast = ts.createSourceFile('', code, ts.ScriptTarget.ES2015, true, ts.ScriptKind.TSX)
@@ -121,7 +121,7 @@ export function transformChinese(code: string, fileName: string) {
     }
   const transformedFile = ts.transform(ast, [transformer]).transformed[0]
   if (!extractOnly && matches.length > 0) {
-    saveFile(transformedFile as any, fileName, [...prefix])
+    saveFile(transformedFile as any, fileName)
   }
   return matches
 }

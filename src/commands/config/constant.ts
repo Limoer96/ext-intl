@@ -6,7 +6,6 @@ export const INIT_CONFIG: ExtCustomConfig = {
   langs: ['zh-CN', 'en-US'],
   extractOnly: true,
   whiteList: ['.ts', '.tsx', '.js', '.jsx'],
-  prefix: [],
   templateString: {
     funcName: 'I18N.get',
   },
