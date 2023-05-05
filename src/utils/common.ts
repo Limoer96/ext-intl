@@ -63,6 +63,18 @@ export function saveFile(ast: ts.SourceFile, fileName: string, prefix?: string[]
   const file = printer.printFile(ast)
   let updateSourceFile = ts.createSourceFile('', file, ts.ScriptTarget.ES2015, true, ts.ScriptKind.TSX)
 
+  // 是否有函数嵌套
+  function isNestedFunction(node: ts.Node) {
+    while (node.parent) {
+      node = node.parent
+      if (ts.isFunctionDeclaration(node) || ts.isArrowFunction(node)) {
+        return true
+      }
+    }
+    return false
+  }
+
+  // 返回值是否是jsx
   function visitReturnStatement(node: ts.Node) {
     if (node) {
       switch (node.kind) {
@@ -88,13 +100,14 @@ export function saveFile(ast: ts.SourceFile, fileName: string, prefix?: string[]
 
   function visit(node: ts.Node) {
     if (
-      (node.kind === ts.SyntaxKind.ArrowFunction &&
-        node.parent?.parent?.parent?.parent?.kind === ts.SyntaxKind.SourceFile) ||
-      (node.kind === ts.SyntaxKind.FunctionDeclaration && node.parent.kind === ts.SyntaxKind.SourceFile) ||
-      (node.kind === ts.SyntaxKind.FunctionDeclaration &&
-        node.parent?.parent?.parent?.parent?.kind === ts.SyntaxKind.SourceFile)
+      node.kind === ts.SyntaxKind.ArrowFunction ||
+      node.kind === ts.SyntaxKind.FunctionDeclaration ||
+      node.kind === ts.SyntaxKind.FunctionExpression
     ) {
-      handleNode(node)
+      const isNested = isNestedFunction(node)
+      if (!isNested) {
+        handleNode(node)
+      }
     }
     ts.forEachChild(node, visit)
   }
