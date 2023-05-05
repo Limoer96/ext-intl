@@ -87,7 +87,13 @@ export function saveFile(ast: ts.SourceFile, fileName: string, prefix?: string[]
   }
 
   function visit(node: ts.Node) {
-    if (node.kind === ts.SyntaxKind.ArrowFunction || node.kind === ts.SyntaxKind.FunctionDeclaration) {
+    if (
+      (node.kind === ts.SyntaxKind.ArrowFunction &&
+        node.parent?.parent?.parent?.parent?.kind === ts.SyntaxKind.SourceFile) ||
+      (node.kind === ts.SyntaxKind.FunctionDeclaration && node.parent.kind === ts.SyntaxKind.SourceFile) ||
+      (node.kind === ts.SyntaxKind.FunctionDeclaration &&
+        node.parent?.parent?.parent?.parent?.kind === ts.SyntaxKind.SourceFile)
+    ) {
       handleNode(node)
     }
     ts.forEachChild(node, visit)
@@ -136,10 +142,6 @@ export function saveFile(ast: ts.SourceFile, fileName: string, prefix?: string[]
     }
   }
   const updateSourceFileText = printer.printFile(updateSourceFile)
-
-  // if (prefix) {
-  //   file = prefix.join('\n') + '\n' + file
-  // }
 
   try {
     fs.writeFileSync(fileName, formatFileWithConfig(updateSourceFileText))
