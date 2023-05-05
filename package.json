@@ -1,6 +1,6 @@
 {
   "name": "ext-intl",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "一个可以提取中文词条和并注入词条名到源文件名的工具",
   "main": "dist/index.js",
   "scripts": {
