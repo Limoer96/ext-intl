@@ -40,8 +40,3 @@ export enum OperatingEnvEnum {
   BROWSER = 'BROWSER',
   NATIVE = 'NATIVE',
 }
-
-export interface DependenciesType {
-  dependencies: string[]
-  devDependencies: string[]
-}

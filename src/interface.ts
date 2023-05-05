@@ -10,3 +10,8 @@ export interface OriginEntryItem {
   mainLangText: string
   langs: any
 }
+
+export interface DependenciesType {
+  dependencies: string[]
+  devDependencies: string[]
+}

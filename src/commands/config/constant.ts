@@ -1,5 +1,5 @@
 import { resolvePath } from '../../utils/common'
-import { DependenciesType, ExtCustomConfig } from './interface'
+import { ExtCustomConfig } from './interface'
 
 export const INIT_CONFIG: ExtCustomConfig = {
   rootPath: resolvePath('./src'),
@@ -20,15 +20,3 @@ export const INIT_CONFIG: ExtCustomConfig = {
 }
 
 export const CONFIG_FILE_NAME = '.extintl.json'
-
-/* APP依赖项 */
-export const APP_DEPENDENCIES: DependenciesType = {
-  dependencies: ['@react-native-async-storage/async-storage'],
-  devDependencies: [],
-}
-
-/* WEB依赖项 */
-export const WEB_DEPENDENCIES: DependenciesType = {
-  dependencies: [],
-  devDependencies: [],
-}

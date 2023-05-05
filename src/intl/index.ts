@@ -6,11 +6,12 @@ import getI18nTemplateString from './i18n'
 import getTypingTemplateString from './typing'
 import getContextTemplate from './context'
 import { formatFileWithConfig } from '../utils/format'
-import { DependenciesType, ExtConfig, OperatingEnvEnum } from '../commands/config/interface'
+import { ExtConfig, OperatingEnvEnum } from '../commands/config/interface'
 import appStorageTemplate from './app-storage'
 import webStorageTemplate from './web-storage'
 import { resolvePath } from '../utils/common'
-import { APP_DEPENDENCIES, WEB_DEPENDENCIES } from '../commands/config/constant'
+import { APP_DEPENDENCIES, WEB_DEPENDENCIES } from '../constant'
+import { DependenciesType } from '../interface'
 /**
  * 写入i18n模版文件
  */

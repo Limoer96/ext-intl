@@ -62,9 +62,9 @@ export function getEntriesInfo(code: string) {
         if (parent.kind === ts.SyntaxKind.ExportAssignment) {
           const propertyAssignment = properties.filter((property) => property.kind === ts.SyntaxKind.PropertyAssignment)
           if (propertyAssignment?.length > 0) {
-            const entryInfo = propertyAssignment.reduce((pre, curr: ts.PropertyAssignment) => {
+            const entryInfo = propertyAssignment.reduce((pre, curr) => {
               const key = (curr.name as ts.Identifier).escapedText as string
-              const value = curr.initializer.getText().replace(/'/g, '')
+              const value = (curr as ts.PropertyAssignment).initializer.getText().replace(/'/g, '')
               return {
                 ...pre,
                 [key]: value,
@@ -92,7 +92,7 @@ export function getEntriesInfo(code: string) {
  */
 export function formateEntryInfo(entryObj: Object) {
   const formattedEntryInfo: UploadEntryType[] = []
-  const keyPath = []
+  const keyPath: string[] = []
   const { langs, langMapper } = <ExtConfig>global['intlConfig']
 
   /**
@@ -104,22 +104,22 @@ export function formateEntryInfo(entryObj: Object) {
   function loop(entryObjItem: Object) {
     if (typeof entryObjItem === 'object') {
       for (let entry in entryObjItem) {
-        const isLanguageTag = langs.includes(entry)
-        keyPath.push(isLanguageTag ? langs[0] : entry)
-        loop(isLanguageTag ? entryObjItem[langs[0]] : entryObjItem[entry])
+        const isLanguageTag = langs?.includes(entry)
+        keyPath.push(isLanguageTag ? langs?.[0]! : entry)
+        loop(isLanguageTag ? entryObjItem[langs?.[0]!] : entryObjItem[entry])
         keyPath.pop()
         if (isLanguageTag) {
           return
         }
       }
     } else {
-      const newLangs = langs.reduce((pre, curr) => {
+      const newLangs = langs?.reduce((pre, curr) => {
         return {
           ...pre,
-          [langMapper[curr]]: getSingleEntry(entryObj, keyPath, curr),
+          [langMapper?.[curr]!]: getSingleEntry(entryObj, keyPath, curr),
         }
       }, {})
-      const mainLangText = newLangs[langMapper[langs[0]]]
+      const mainLangText = newLangs?.[langMapper?.[langs?.[0]!]!]
       const noCharText = mainLangText.replace(
         /[\u0021-\u007E\u00A1-\u00FF\u3001-\u301f\uff01-\uff0f\uff1a-\uff20\uff3b-\uff40\uff5b-\uff65]/g,
         ''
@@ -131,8 +131,8 @@ export function formateEntryInfo(entryObj: Object) {
       if (formattedEntryInfo.findIndex((item) => item.key === pinYinStr || item.mainLangText === mainLangText) === -1) {
         formattedEntryInfo.push({
           key: pinYinStr.length > 40 ? '' : pinYinStr,
-          langs: newLangs,
-          mainLang: langMapper[langs[0]],
+          langs: newLangs!,
+          mainLang: langMapper?.[langs?.[0]!]!,
           mainLangText: mainLangText,
         })
       }
@@ -153,7 +153,7 @@ export function formateEntryInfo(entryObj: Object) {
 export function getSingleEntry(entryObj: Object, keyPath: string[], lang: string) {
   const { langs } = <ExtConfig>global['intlConfig']
   const tempArray = [...keyPath]
-  const index = keyPath.findIndex((item) => item === langs[0])
+  const index = keyPath.findIndex((item) => item === langs?.[0])
 
   tempArray.splice(index, 1, lang)
 
@@ -168,7 +168,7 @@ export function getSingleEntry(entryObj: Object, keyPath: string[], lang: string
  */
 export async function extractEntryRequest(entryInfo: UploadEntryType[], isCover: boolean) {
   const { origin, accessKey } = <ExtConfig>global['intlConfig']
-  const res = await request(origin, extractGql, {
+  const res = await request(origin!, extractGql, {
     accessKey,
     entries: entryInfo,
     isCover,
