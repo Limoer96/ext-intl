@@ -2,7 +2,9 @@ import * as ts from 'typescript'
 import { ExtConfig } from '../commands/config/interface'
 import { DOUBLE_BYTE_REGEX } from '../constant'
 import { OriginEntryItem } from '../interface'
-import { removeFileComment, saveFile, getVariableFromTmeplateString, getQuotePath } from '../utils/common'
+import { removeFileComment, saveFile, getVariableFromTemplateString } from '../utils/common'
+import pinyin from 'pinyin'
+import { flatten } from '../commands/extract/utils'
 export interface Text {
   key: string
   value: string
@@ -16,28 +18,40 @@ export interface Text {
  * @param fileName 当前文件路径名
  */
 export function transformChinese(code: string, fileName: string) {
-  const { extractOnly, prefix, templateString, fieldPrefix, versionName, rootPath } = <ExtConfig>global['intlConfig']
+  const { extractOnly, templateString } = <ExtConfig>global['intlConfig']
   const entries: OriginEntryItem[] = global['local_entries']
   const matches: Array<Text> = []
   const ast = ts.createSourceFile('', code, ts.ScriptTarget.ES2015, true, ts.ScriptKind.TSX)
   const factory = ts.factory
-  const quotePath = getQuotePath(rootPath, fileName, versionName)
-  let index = 1
+
+  function generateKey(text: string) {
+    const noCharText = text.replace(
+      /[\u0021-\u007E\u00A1-\u00FF\u3001-\u301f\uff01-\uff0f\uff1a-\uff20\uff3b-\uff40\uff5b-\uff65]/g,
+      ''
+    )
+    const pinYinArr = pinyin(noCharText, {
+      style: 'tone2',
+    })
+    const pinYinStr = flatten(pinYinArr).join('_')
+
+    return pinYinStr.length > 40 ? '' : pinYinStr
+  }
   const transformer =
     <T extends ts.Node>(context: ts.TransformationContext) =>
     (rootNode: T) => {
       function visit(node: ts.Node) {
-        const name = `${fieldPrefix}_${index}` // 按照前缀&索引生成的默认词条key
         switch (node.kind) {
           case ts.SyntaxKind.StringLiteral: {
             const { text } = <ts.StringLiteral>node
             if (text.match(DOUBLE_BYTE_REGEX)) {
+              const textKey = generateKey(text)
               // 1. 在本地寻找词条，如果找到
-              const finded = entries.find((entry) => entry.mainLangText === text)
-              const langs = finded?.langs || {}
-              const key = finded?.key || name
+              const findEntry = entries.find((entry) => entry.key === textKey)
+              const langs = findEntry?.langs || {}
+              const key = findEntry?.key || textKey
+              const isMatch = !!findEntry
               matches.push({
-                isMatch: !!finded,
+                isMatch,
                 key,
                 value: text,
                 comment: `
@@ -46,11 +60,12 @@ export function transformChinese(code: string, fileName: string) {
                  */`,
                 ...langs,
               })
-              index += 1
-              const parentNodeKind = node.parent.kind
-              const result =
-                parentNodeKind === ts.SyntaxKind.JsxAttribute ? `{${quotePath}.${key}}` : `${quotePath}.${key}`
-              return factory.createIdentifier(result)
+              if (isMatch) {
+                const parentNodeKind = node.parent.kind
+                const result =
+                  parentNodeKind === ts.SyntaxKind.JsxAttribute ? `{I18N.index.${key}}` : `I18N.index.${key}`
+                return factory.createIdentifier(result)
+              }
             }
             break
           }
@@ -59,11 +74,13 @@ export function transformChinese(code: string, fileName: string) {
             let noCommentText = removeFileComment(text, fileName)
             if (noCommentText.match(DOUBLE_BYTE_REGEX)) {
               noCommentText.replace(';\n', '')
-              const finded = entries.find((entry) => entry.mainLangText === noCommentText)
-              const langs = finded?.langs || {}
-              const key = finded?.key || name
+              const textKey = generateKey(noCommentText)
+              const findEntry = entries.find((entry) => entry.key === textKey)
+              const langs = findEntry?.langs || {}
+              const key = findEntry?.key || textKey
+              const isMatch = !!findEntry
               matches.push({
-                isMatch: !!finded,
+                isMatch,
                 key,
                 value: noCommentText,
                 comment: `
@@ -72,8 +89,9 @@ export function transformChinese(code: string, fileName: string) {
                  */`,
                 ...langs,
               })
-              index += 1
-              return factory.createJsxText(`{${quotePath}.${key}}`)
+              if (isMatch) {
+                return factory.createJsxText(`{I18N.index.${key}}`)
+              }
             }
             break
           }
@@ -82,12 +100,14 @@ export function transformChinese(code: string, fileName: string) {
             let text = code.slice(pos, end)
             if (text.match(DOUBLE_BYTE_REGEX)) {
               text.replace(/\$(?=\{)/g, '')
+              const textKey = generateKey(text)
               if (templateString && templateString.funcName) {
-                const finded = entries.find((entry) => entry.mainLangText === text)
-                const langs = finded?.langs || {}
-                const key = finded?.key || name
+                const findEntry = entries.find((entry) => entry.key === textKey)
+                const langs = findEntry?.langs || {}
+                const key = findEntry?.key || textKey
+                const isMatch = !!findEntry
                 matches.push({
-                  isMatch: !!finded,
+                  isMatch,
                   key,
                   value: text,
                   comment: `
@@ -96,18 +116,19 @@ export function transformChinese(code: string, fileName: string) {
                  */`,
                   ...langs,
                 })
-                index += 1
-                // 返回新的节点(函数调用)
-                const variableList: string[] = getVariableFromTmeplateString(text)
-                const objParam = factory.createObjectLiteralExpression(
-                  variableList.map((variable) =>
-                    factory.createPropertyAssignment(variable, factory.createIdentifier(variable))
+                if (isMatch) {
+                  // 返回新的节点(函数调用)
+                  const variableList: string[] = getVariableFromTemplateString(text)
+                  const objParam = factory.createObjectLiteralExpression(
+                    variableList.map((variable) =>
+                      factory.createPropertyAssignment(variable, factory.createIdentifier(variable))
+                    )
                   )
-                )
-                return factory.createCallExpression(factory.createIdentifier(templateString.funcName), undefined, [
-                  factory.createIdentifier(`${quotePath}.${key}`),
-                  objParam,
-                ])
+                  return factory.createCallExpression(factory.createIdentifier(templateString.funcName), undefined, [
+                    factory.createIdentifier(`I18N.index.${key}`),
+                    objParam,
+                  ])
+                }
               } else {
                 console.warn(`模板字符串：${fileName} ${text} 无法处理`)
               }
@@ -121,7 +142,7 @@ export function transformChinese(code: string, fileName: string) {
     }
   const transformedFile = ts.transform(ast, [transformer]).transformed[0]
   if (!extractOnly && matches.length > 0) {
-    saveFile(transformedFile as any, fileName, [...prefix])
+    saveFile(transformedFile as any, fileName)
   }
   return matches
 }

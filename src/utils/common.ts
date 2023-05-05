@@ -54,9 +54,8 @@ export function getQuotePath(rootPath: string, filePath: string, versionName: st
  * 转换后的文件保存到文件
  * @param ast 转换后的ast
  * @param fileName 文件名路径
- * @param prefix 前缀字符串
  */
-export function saveFile(ast: ts.SourceFile, fileName: string, prefix?: string[]) {
+export function saveFile(ast: ts.SourceFile, fileName: string) {
   const targetArr = []
   const factory = ts.factory
   const printer = ts.createPrinter()
@@ -179,7 +178,7 @@ export function is(obj: any, type: string) {
  * @param text 模板字符串
  */
 
-export function getVariableFromTmeplateString(text: string): string[] {
+export function getVariableFromTemplateString(text: string): string[] {
   if (!text) {
     return []
   }

@@ -17,7 +17,7 @@ export async function start(config: ExtConfig, operatingEnv: OperatingEnvEnum) {
     }
     const entries = await readEntryFile()
     global['local_entries'] = entries
-    const { outputPath, versionName, langs, rootPath, origin, accessKey, extractOnly } = config
+    const { outputPath, langs, rootPath, origin, accessKey, extractOnly } = config
     console.log('[INFO] 开始提取...')
     console.time('[INFO] 提取用时')
     const unMatchedList: Text[] = []
@@ -26,7 +26,7 @@ export async function start(config: ExtConfig, operatingEnv: OperatingEnvEnum) {
       await mkRootDirIfNeeded()
       if (!extractOnly) {
         for (const lang of langs) {
-          await fs.mkdir(`${outputPath}/langs/${versionName}/${lang}`, { recursive: true })
+          await fs.mkdir(`${outputPath}/langs/${lang}`, { recursive: true })
         }
       }
     } catch (error) {

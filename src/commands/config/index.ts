@@ -44,7 +44,6 @@ export function getMergedConfig(config: ExtCustomConfig): ExtConfig {
     ...INIT_CONFIG,
     ...config,
     outputPath: getOutputPath(),
-    versionName: getVersionName(),
   }
 }
 

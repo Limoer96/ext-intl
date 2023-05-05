@@ -42,16 +42,11 @@ function writeTotalExportEntry() {
   const extname = '.' + (isUseTs ? 'ts' : 'js')
   let content = ''
   try {
-    const files = fs
-      .readdirSync(basePath)
-      .filter((file) => fs.statSync(`${basePath}/${file}`).isDirectory() && file.includes('v'))
-    for (const file of files) {
-      for (const lang of langs) {
-        content += `import ${file}_${getLangCountryCode(lang)} from './${file}/${lang}/_index';`
-      }
+    for (const lang of langs) {
+      content += `import ${lang} from './${lang}/_index';`
     }
     for (const lang of langs) {
-      content += `export const ${getLangJSProperty(lang)} = ${getExportContentByLang(lang, files)};`
+      content += `export const ${lang.toUpperCase()} = { ...${lang} };`
     }
   } catch (error) {}
   content = formatFileWithConfig(content)
