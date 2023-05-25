@@ -142,19 +142,14 @@ function checkConfig(config: ExtCustomConfig): Promise<ExtConfig>;
 export const DEFAULT_CONFIG: IConfig = {
   outputPath: resolvePath('./i18n'),
   rootPath: resolvePath('./src'),
-  langs: ['zh-CN', 'en-US'],
+  langs: ['zh', 'en'],
   extractOnly: true,
   whiteList: ['.ts', '.tsx', '.js', '.jsx'],
   templateString: {
     funcName: 'kiwiIntl.get',
   },
-  fieldPrefix: 'intl',
   origin: '',
   accessKey: '',
-  langMapper: {
-    'zh-CN': 'zh',
-    'en-US': 'en',
-  },
 }
 ```
 

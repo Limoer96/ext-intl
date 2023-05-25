@@ -23,6 +23,7 @@ export function formatFileWithConfig(
     arrowParens: 'avoid',
     semi: false,
     useTabs: true,
+    proseWrap: 'never',
   }
   try {
     const configFinded = prettier.resolveConfig.sync(configFilePath)

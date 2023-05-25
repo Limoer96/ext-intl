@@ -21,9 +21,11 @@ export function traverseDir(pathName: string, getUnMatchedEntries?: (entries: Te
     const text = fs.readFileSync(pathName).toString()
     const result = transformChinese(text, pathName)
     getUnMatchedEntries(result.filter((item) => !item.isMatch))
+
     // 只有非提取模式下才生成词条文件
     if (!extractOnly) {
-      writeOutputFile(removeDuplicatedTextList(result), pathName)
+      writeOutputFile(removeDuplicatedTextList(result).filter((item) => item.isMatch))
+      writeDirExportEntry()
     }
   } else {
     // 文件夹
@@ -34,9 +36,5 @@ export function traverseDir(pathName: string, getUnMatchedEntries?: (entries: Te
         traverseDir(absPath, getUnMatchedEntries)
       }
     })
-    if (!extractOnly) {
-      // 针对文件夹写入入口文件
-      writeDirExportEntry(pathName)
-    }
   }
 }

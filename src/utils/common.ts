@@ -178,7 +178,7 @@ export function is(obj: any, type: string) {
  * @param text 模板字符串
  */
 
-export function getVariableFromTmeplateString(text: string): string[] {
+export function getVariableFromTemplateString(text: string): string[] {
   if (!text) {
     return []
   }
