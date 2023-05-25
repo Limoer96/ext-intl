@@ -21,9 +21,10 @@ export function traverseDir(pathName: string, getUnMatchedEntries?: (entries: Te
     const text = fs.readFileSync(pathName).toString()
     const result = transformChinese(text, pathName)
     getUnMatchedEntries(result.filter((item) => !item.isMatch))
+
     // 只有非提取模式下才生成词条文件
     if (!extractOnly) {
-      writeOutputFile(removeDuplicatedTextList(result))
+      writeOutputFile(removeDuplicatedTextList(result).filter((item) => item.isMatch))
       writeDirExportEntry()
     }
   } else {

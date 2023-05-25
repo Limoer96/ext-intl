@@ -64,7 +64,7 @@ export function getEntriesInfo(code: string) {
           if (propertyAssignment?.length > 0) {
             const entryInfo = propertyAssignment.reduce((pre, curr) => {
               const key = (curr.name as ts.Identifier).escapedText as string
-              const value = (curr as ts.PropertyAssignment).initializer.getText().replace(/'/g, '')
+              const value = (curr as ts.PropertyAssignment).initializer.getText().replace(/'|"/g, '')
               return {
                 ...pre,
                 [key]: value,
@@ -93,7 +93,7 @@ export function getEntriesInfo(code: string) {
 export function formateEntryInfo(entryObj: Object) {
   const formattedEntryInfo: UploadEntryType[] = []
   const keyPath: string[] = []
-  const { langs, langMapper } = <ExtConfig>global['intlConfig']
+  const { langs } = <ExtConfig>global['intlConfig']
 
   /**
    * 格式化词条信息
@@ -116,10 +116,10 @@ export function formateEntryInfo(entryObj: Object) {
       const newLangs = langs?.reduce((pre, curr) => {
         return {
           ...pre,
-          [langMapper?.[curr]!]: getSingleEntry(entryObj, keyPath, curr),
+          [curr]: getSingleEntry(entryObj, keyPath, curr),
         }
       }, {})
-      const mainLangText = newLangs?.[langMapper?.[langs?.[0]!]!]
+      const mainLangText = newLangs?.[langs?.[0]!]
       const noCharText = mainLangText.replace(
         /[\u0021-\u007E\u00A1-\u00FF\u3001-\u301f\uff01-\uff0f\uff1a-\uff20\uff3b-\uff40\uff5b-\uff65]/g,
         ''
@@ -132,7 +132,7 @@ export function formateEntryInfo(entryObj: Object) {
         formattedEntryInfo.push({
           key: pinYinStr.length > 40 ? '' : pinYinStr,
           langs: newLangs!,
-          mainLang: langMapper?.[langs?.[0]!]!,
+          mainLang: langs?.[0]!,
           mainLangText: mainLangText,
         })
       }

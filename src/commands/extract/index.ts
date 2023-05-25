@@ -9,6 +9,7 @@ export async function extract(config: ExtConfig, cover: boolean = false, path: s
     try {
       console.time('读取用时')
       const entryInfo = await readMultipleLanguageEntry(path)
+
       console.timeEnd('读取用时')
       const uploadPayload = formateEntryInfo(entryInfo)
 

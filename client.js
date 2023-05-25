@@ -30,8 +30,10 @@ program
   .option('-e, --env <char>', '运行环境', "BROWSER")
   .action(async (options) => {
     const config = await checkConfig()
-    await sync(config.origin, config.accessKey)
-    await start(config, options.env)
+    const isSyncSuccess = await sync(config.origin, config.accessKey)
+    if (isSyncSuccess) {
+      await start(config, options.env)
+    }
   })
 program
   .command('update')
@@ -39,8 +41,10 @@ program
   .action(async () => {
     const localConfig = await readConfigFile()
     const config = getMergedConfig(localConfig)
-    await sync(config.origin, config.accessKey)
-    await update(config.langs[0])
+    const isSyncSuccess = await sync(config.origin, config.accessKey)
+    if (isSyncSuccess) {
+      await update(config.langs[0])
+    }
   })
 program
   .command('config')
@@ -49,7 +53,6 @@ program
   .action(async (options) => {
     await generateConfigFile(options.override)
   })
-
 program
   .command('extract')
   .description('上传本地词条至远程词库')

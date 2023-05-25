@@ -40,13 +40,18 @@ function writeTotalExportEntry() {
   const { langs, outputPath } = <ExtConfig>global['intlConfig']
   const basePath = `${outputPath}/langs`
   const extname = '.' + (isUseTs ? 'ts' : 'js')
+  const dirObj = {}
   let content = ''
   try {
     for (const lang of langs) {
-      content += `import ${lang} from './${lang}/_index';`
+      const dir = fs.readdirSync(`${basePath}/${lang}`)
+      if (dir.length) {
+        content += `import ${lang} from './${lang}/_index';`
+        dirObj[lang] = dir
+      }
     }
     for (const lang of langs) {
-      content += `export const ${lang.toUpperCase()} = { ...${lang} };`
+      content += `export const ${lang.toUpperCase()} = ${dirObj[lang]?.length ? `{ ...${lang} };` : '{ };'} `
     }
   } catch (error) {}
   content = formatFileWithConfig(content)

@@ -1,7 +1,7 @@
 function getLangEnum(langs: string[]) {
   const langEnumArr = []
   for (const lang of langs) {
-    langEnumArr.push(`${lang.replace('-', '')} = '${lang}',`)
+    langEnumArr.push(`${lang.toUpperCase()} = '${lang}',`)
   }
   return `
     export enum LangEnum {

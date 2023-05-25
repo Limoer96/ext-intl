@@ -2,7 +2,7 @@ import * as chalk from 'chalk'
 import * as fs from 'fs/promises'
 import { ExtConfig, ExtCustomConfig } from './interface'
 import { CONFIG_FILE_NAME, INIT_CONFIG } from './constant'
-import { getOutputPath, getVersionName, handle, isAndEmpty, log, resolvePath } from '../../utils/common'
+import { getOutputPath, handle, isAndEmpty, log, resolvePath } from '../../utils/common'
 import { formatFileWithConfig } from '../../utils/format'
 import { diffConfig } from './utils'
 

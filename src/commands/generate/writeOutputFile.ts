@@ -7,10 +7,9 @@ import { formatFileWithConfig } from '../../utils/format'
 import { ExtConfig } from '../config/interface'
 
 function getText(textObj: Text, lang: string) {
-  const { langMapper, langs } = <ExtConfig>global['intlConfig']
+  const { langs } = <ExtConfig>global['intlConfig']
   const isMainLang = lang === langs[0]
-  const langKey = langMapper[lang] || lang
-  const text = isMainLang ? textObj.value : textObj[langKey] || ''
+  const text = isMainLang ? textObj.value : textObj[lang] || ''
   return text
     .replace(/;/g, '')
     .replace(/[\r\n]/g, '')
@@ -22,8 +21,9 @@ function getText(textObj: Text, lang: string) {
  * 读取并更新i18n文件
  * @param textArr 提取词条数组
  * @param filePath 读取文件路径
+ * @param lang 语言
  */
-function readAndUpdateI18nFile(textArr: Text[], filePath: string) {
+function readAndUpdateI18nFile(textArr: Text[], filePath: string, lang: string) {
   let entryObj
   const promiseText = fs.readFileSync(filePath)
   const ast = ts.createSourceFile(
@@ -34,7 +34,7 @@ function readAndUpdateI18nFile(textArr: Text[], filePath: string) {
     isUseTs ? ts.ScriptKind.TS : ts.ScriptKind.JS
   )
   const factory = ts.factory
-  const printer = ts.createPrinter()
+  const printer = ts.createPrinter({})
   const transformer =
     <T extends ts.Node>(context: ts.TransformationContext) =>
     (rootNode: T) => {
@@ -50,26 +50,28 @@ function readAndUpdateI18nFile(textArr: Text[], filePath: string) {
                 // 读取词条信息
                 entryObj = propertyAssignment.reduce((pre, curr) => {
                   const key = (curr.name as ts.Identifier).escapedText as string
-                  const value = (curr as ts.PropertyAssignment).initializer.getText().replace(/'/g, '')
+                  const value = (curr as ts.PropertyAssignment).initializer.getText().replace(/'|"/g, '')
                   return {
                     ...pre,
                     [key]: value,
                   }
                 }, {})
-                const propertyArray = newEntryArr.map((item) => {
-                  const property = factory.createPropertyAssignment(
-                    factory.createIdentifier(item.key),
-                    factory.createStringLiteral(item.value)
-                  )
-                  // 添加注释
-                  const commentProperty = ts.addSyntheticLeadingComment(
-                    property,
-                    ts.SyntaxKind.MultiLineCommentTrivia,
-                    `${item.value} `,
-                    false
-                  )
-                  return commentProperty
-                })
+                const propertyArray = textArr
+                  .filter((item) => !entryObj?.[item.key])
+                  .map((item) => {
+                    const property = factory.createPropertyAssignment(
+                      factory.createIdentifier(`${item.key}`),
+                      factory.createStringLiteral(item?.[lang]?.replace(/[\r\n;]/g, '') || '')
+                    )
+                    // 添加注释
+                    const commentProperty = ts.addSyntheticLeadingComment(
+                      property,
+                      ts.SyntaxKind.MultiLineCommentTrivia,
+                      `*\n* ${item.value.replace(/[\r\n;]/g, '')}\n`,
+                      false
+                    )
+                    return commentProperty
+                  })
                 return factory.createObjectLiteralExpression([...propertyArray, ...propertyAssignment])
               }
             }
@@ -81,11 +83,17 @@ function readAndUpdateI18nFile(textArr: Text[], filePath: string) {
       return ts.visitNode(rootNode, visit)
     }
   const transformedFile = ts.transform(ast, [transformer]).transformed[0]
-  const newEntryArr = textArr.filter((item) => !entryObj?.[item.key] && item.isMatch)
 
+  const newEntryArr = textArr.filter((item) => !entryObj?.[item.key])
   if (newEntryArr.length) {
+    function unicodeToChar(str: string) {
+      return str.replace(/\\u[\dA-F]{4}/gi, function (match) {
+        return String.fromCharCode(parseInt(match.replace(/\\u/g, ''), 16))
+      })
+    }
     const file = printer.printFile(transformedFile as ts.SourceFile)
-    fs.writeFileSync(filePath, formatFileWithConfig(file))
+    const formateFile = unicodeToChar(file)
+    fs.writeFileSync(filePath, formatFileWithConfig(formateFile), { encoding: 'utf-8' })
   }
 }
 
@@ -96,7 +104,6 @@ function readAndUpdateI18nFile(textArr: Text[], filePath: string) {
  * @param lang 语言
  */
 function firstWriteI18nFile(textArr: Text[], filePath: string, lang: string) {
-  fs.mkdirSync(filePath, { recursive: true })
   let textStr = textArr
     .map(
       (text) =>
@@ -128,7 +135,7 @@ function writeOutputFile(textArr: Text[], lang: string) {
   if (!exist) {
     firstWriteI18nFile(textArr, filePath, lang)
   } else {
-    readAndUpdateI18nFile(textArr, filePath)
+    readAndUpdateI18nFile(textArr, filePath, lang)
   }
 }
 

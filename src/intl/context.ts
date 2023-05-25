@@ -13,11 +13,11 @@ function getContextTemplate(isNative: boolean) {
     `)
   } else {
     effectArray.push(`
-      const lang = Storage.getLocalStorage(LANG_STORAGE_KEY)
+      const lang = Storage.get(LANG_STORAGE_KEY)
       if (lang) {
         i18n.setLang(lang)
       } else {
-        Storage.setLocalStorage(LANG_STORAGE_KEY, i18n.currentLang)
+        Storage.set(LANG_STORAGE_KEY, i18n.currentLang)
       }
       forceUpdate({})
     `)

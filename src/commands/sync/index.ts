@@ -16,6 +16,12 @@ const syncDoc = gql`
   }
 `
 
+const extractGql = gql`
+  mutation ExtractLocalEntries($accessKey: String!, $entries: [ExtractLocalEntryItem]!, $isCover: Boolean) {
+    extractLocalEntries(accessKey: $accessKey, entries: $entries, isCover: $isCover)
+  }
+`
+
 const postDoc = gql`
   mutation UploadEntries($entries: [UploadEntryItem]!, $accessKey: String) {
     uploadEntries(entries: $entries, accessKey: $accessKey)
@@ -31,7 +37,7 @@ const postDoc = gql`
 export async function sync(origin: string, accessKey: string) {
   if (!accessKey || !origin) {
     log(chalk.red('请检查配置文件，确保origin/accessKey正确配置'))
-    return
+    return false
   }
   const res = await request(origin, syncDoc, { accessKey })
   const data: OriginEntryItem[] = res.getAllEntries || []
@@ -39,6 +45,7 @@ export async function sync(origin: string, accessKey: string) {
   await mkRootDirIfNeeded()
   await fs.writeFile(`${rootDir}/entries.json`, formatFileWithConfig(JSON.stringify(data), undefined, 'json-stringify'))
   log(chalk.green('远程词条获取完毕'))
+  return true
 }
 
 export type UploadEntryItem = {
@@ -61,6 +68,6 @@ export async function upload({ origin, accessKey, entries }: UploadConfig) {
     log(chalk.yellow('无可上传的词条'))
     return
   }
-  await request(origin, postDoc, { accessKey, entries })
+  await request(origin, extractGql, { accessKey, entries })
   log(chalk.green('词条已推送至远程'))
 }
